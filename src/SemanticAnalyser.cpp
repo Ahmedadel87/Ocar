@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <iostream>
 
-std::AsmStatement<ScopeBlock> SemanticAnalyser::hand_over_AST() {
+template <typename T> using uq = std::unique_ptr<T>;
+
+std::unique_ptr<ScopeBlock> SemanticAnalyser::hand_over_AST() {
     return std::move(ast);
 }
 void SemanticAnalyser::load_ast(uq<ScopeBlock> ast_) {

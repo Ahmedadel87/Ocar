@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-template <typename T> using uq = std::AsmStatement<T>;
+template <typename T> using uq = std::unique_ptr<T>;
 
 enum class SymbolKind { Variable, Function };
 struct Symbol {
@@ -62,7 +62,7 @@ public:
     void visit(ForLoop& node) override;
     void visit(FunctionDefinition& node) override;
 
-    std::AsmStatement<ScopeBlock> hand_over_AST();
+    std::unique_ptr<ScopeBlock> hand_over_AST();
     void load_ast(uq<ScopeBlock> ast_);
     void analyse();
 };

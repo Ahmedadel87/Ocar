@@ -147,6 +147,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"--", TokenType::MinusMinus},
      {"||", TokenType::DoubleStraightLine},
      {"&&", TokenType::DoubleAmpersand}}};
+const std::array<std::string, 3> registers = {"rax", "rdi", "rsi"};
 
 struct ExpressionInfo {
     VariableType type;

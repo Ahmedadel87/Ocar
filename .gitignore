@@ -54,5 +54,5 @@ Thumbs.db
 .cache/*
 
 # Code files
-code.scl
-output.sh
+main.casm
+out.asm
