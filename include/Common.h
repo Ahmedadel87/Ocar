@@ -68,7 +68,6 @@ public:
     SourceLocation(int r, int c) : row(r), column(c) {}
     SourceLocation() = default;
 };
-
 const std::unordered_map<std::string, TokenType> word_table{
     {{"", TokenType::None},
      {"rtn", TokenType::KeywordRoutine},
@@ -103,7 +102,6 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"-", TokenType::Minus},
      {",", TokenType::Comma},
      {"=", TokenType::EqualSign}}};
-
 struct ExpressionInfo {
     bool isLValue = false;
     bool isConstant = false;

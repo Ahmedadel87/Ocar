@@ -5,6 +5,7 @@
 
 template <typename T> using uq = std::unique_ptr<T>;
 
+// == HELPERS ==
 std::unique_ptr<ScopeBlock> SemanticAnalyser::hand_over_AST() {
     return std::move(ast);
 }
@@ -61,19 +62,6 @@ ExpressionInfo SemanticAnalyser::analyseExpression(Expression* expr) {
     }
     return ExpressionInfo();
 }
-bool SemanticAnalyser::commandExists(const std::string& cmd) {
-    size_t pos = cmd.find('.');
-    std::string first = (pos == std::string::npos) ? cmd : cmd.substr(0, pos);
-
-    std::string command = "command -v " + first + " >/dev/null 2>&1";
-    return std::system(command.c_str()) == 0;
-}
-bool SemanticAnalyser::commandIncluded(const std::string& cmd) {
-    size_t pos = cmd.find(' ');
-    std::string first = (pos == std::string::npos) ? cmd : cmd.substr(0, pos);
-
-    return false;
-}
 
 void SemanticAnalyser::enter_scope() {
     if (stack.size() > 0)
@@ -106,6 +94,30 @@ const Symbol* SemanticAnalyser::getSymbol(const std::string& identifier) const {
         scp = scp->parent;
     }
     return nullptr;
+}
+
+void SemanticAnalyser::push_active_memory(const std::string& memname, const std::string& varname) {
+    activeMemory.push_back(std::pair<std::string, std::string>(memname, varname));
+}
+void SemanticAnalyser::remove_active_memory(const std::string& varname) {
+    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
+                           [&](const auto& p) { return p.second == varname; });
+
+    if (it != activeMemory.end()) {
+        activeMemory.erase(it);
+    } else { // ehhh idk what to do here so let's just throw
+        semaPanic("internal, cannot remove variable \"" + varname +
+                  "\" from active memory; it does not exist");
+    }
+}
+std::string& SemanticAnalyser::find_in_active_memory(const std::string& memname) {
+    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
+                           [&](const auto& p) { return p.first == memname; });
+
+    if (it != activeMemory.end())
+        return it->second;
+    else
+        return emptystring;
 }
 
 // == VISIT ==
@@ -166,6 +178,12 @@ void SemanticAnalyser::visit(VariableReassignment& node) {
     }
 }
 void SemanticAnalyser::visit(VariableDefinition& node) {
+    std::string& othervar = find_in_active_memory(node.memory);
+    if (!othervar.empty()) {
+        semaPanic("cannot reassign memory \"" + node.memory + "\" to \"" + node.identifier +
+                  "\"; it is already taken by \"" + othervar + "\"");
+    }
+    push_active_memory(node.memory, node.identifier);
     addSymbol(Symbol(node.identifier, SymbolKind::Variable));
 }
 void SemanticAnalyser::visit(UnaryExpression& node) {

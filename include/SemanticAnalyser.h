@@ -18,6 +18,7 @@ struct Symbol {
 };
 
 class SemanticAnalyser : public Visitor {
+    std::string emptystring = ""; // referenced later
     uq<ScopeBlock> ast = nullptr;
     struct Scope {
         Scope* parent = nullptr;
@@ -26,14 +27,17 @@ class SemanticAnalyser : public Visitor {
         explicit Scope(Scope* parent_) : parent(parent_) {}
     };
     std::vector<uq<Scope>> stack;
+    std::vector<std::pair<std::string, std::string>> activeMemory; // mem name -> var name
 
     void enter_scope();
     void exit_scope();
     void addSymbol(const Symbol& symbol);
     void semaPanic(const std::string& msg, SourceLocation src = SourceLocation());
 
-    bool commandIncluded(const std::string& cmd);
-    bool commandExists(const std::string& cmd);
+    void push_active_memory(const std::string& memname, const std::string& varname);
+    void remove_active_memory(const std::string& varname);
+    std::string& find_in_active_memory(const std::string& memname);
+
     bool symbolExists(const std::string& identifier) const;
     const Symbol* getSymbol(const std::string& identifier) const;
 
