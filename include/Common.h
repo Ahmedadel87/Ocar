@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-extern std::vector<std::string> includes;
-
 enum class VariableType { ANY, INT, FLOAT, STRING, CHAR, BOOL, VOID };
 
 enum class TokenType {

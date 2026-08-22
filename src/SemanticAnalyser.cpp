@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-std::unique_ptr<ScopeBlock> SemanticAnalyser::hand_over_AST() {
+std::AsmStatement<ScopeBlock> SemanticAnalyser::hand_over_AST() {
     return std::move(ast);
 }
 void SemanticAnalyser::load_ast(uq<ScopeBlock> ast_) {
@@ -11,11 +11,6 @@ void SemanticAnalyser::load_ast(uq<ScopeBlock> ast_) {
 }
 void SemanticAnalyser::analyse() {
     enter_scope();
-
-    for (auto& inc : includes) {
-        addSymbol(Symbol(inc, SymbolKind::Function, VariableType::STRING,
-                         std::vector<VariableType>{VariableType::ANY}));
-    }
 
     ast->accept(*this);
     exit_scope();
@@ -123,11 +118,6 @@ bool SemanticAnalyser::commandIncluded(const std::string& cmd) {
     size_t pos = cmd.find(' ');
     std::string first = (pos == std::string::npos) ? cmd : cmd.substr(0, pos);
 
-    for (auto& inc : includes) {
-        if (inc == first) {
-            return true;
-        }
-    }
     return false;
 }
 

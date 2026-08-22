@@ -10,7 +10,6 @@
 #define next                                                                                       \
     advance();                                                                                     \
     continue
-std::vector<std::string> includes;
 
 void Tokenizer::advance(int amount) {
     if (peek() == '\n') {

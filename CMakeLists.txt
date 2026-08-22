@@ -1,43 +1,37 @@
 cmake_minimum_required(VERSION 3.16)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Debug)
-project(sysCall VERSION 0.1.0 LANGUAGES CXX)
-option(sysCall_BUILD_TESTS "Build BBS-Mallocator tests" OFF)
-option(sysCall_RUN_BENCHMARKS "Run BBS-MALLOCATOR benchmarks" OFF)
+project(CasmLang VERSION 0.1.0 LANGUAGES CXX)
+option(CasmLang_BUILD_TESTS "Build BBS-Mallocator tests" OFF)
+option(CasmLang_RUN_BENCHMARKS "Run BBS-MALLOCATOR benchmarks" OFF)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-
-add_executable(sysCall
+add_executable(CasmLang
         src/main.cpp
-        src/sysCall.cpp
+        src/CasmLang.cpp
         src/Tokenizer.cpp
         src/Parser.cpp
         src/Visitor.cpp
         src/SemanticAnalyser.cpp
-        src/IrGenertor.cpp
-        src/AsmPrinter.cpp
 )
-target_include_directories(sysCall
+target_include_directories(CasmLang
     PRIVATE
         ${CMAKE_SOURCE_DIR}/include
 )
+target_compile_features(CasmLang PRIVATE cxx_std_20)
 
-if(sysCall_BUILD_TESTS)
+if(CasmLang_BUILD_TESTS)
   include(CTest)
   enable_testing()
 
-  add_executable(sysCall_test
+  add_executable(CasmLang_test
         tests/test.cpp
     )
 
-  add_test(NAME RunBBSMallocatorTests COMMAND sysCall_test)
+  add_test(NAME RunBBSMallocatorTests COMMAND CasmLang_test)
 endif()
 
-if(sysCall_RUN_BENCHMARKS)
-  add_executable(sysCall_benchmark
+if(CasmLang_RUN_BENCHMARKS)
+  add_executable(CasmLang_benchmark
     benchmarks/benchmark.cpp
   )
 endif()

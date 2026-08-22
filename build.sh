@@ -1,6 +1,6 @@
 #!/bin/bash
-cmake -B build -DSysCAll_BUILD_TESTS=ON
+cmake -B build -DCasmLang_BUILD_TESTS=ON
 cmake --build build
-./build/sysCall_test
-./build/sysCall $1
+./build/CasmLang_test
+./build/CasmLang $1
 cd ..

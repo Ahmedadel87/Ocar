@@ -7,7 +7,7 @@
 void Parser::load_tokens(std::vector<Token> tkns) {
     tokens = std::move(tkns);
 }
-std::unique_ptr<ScopeBlock> Parser::hand_over_AST() {
+std::AsmStatement<ScopeBlock> Parser::hand_over_AST() {
     return std::move(entry_point);
 }
 
@@ -15,8 +15,8 @@ void Parser::parse() {
     cursor = 0;
     entry_point = parseScope(false);
 }
-std::unique_ptr<ScopeBlock> Parser::parseScope(bool require_brackets) {
-    std::unique_ptr<ScopeBlock> scope = std::make_unique<ScopeBlock>();
+std::AsmStatement<ScopeBlock> Parser::parseScope(bool require_brackets) {
+    std::AsmStatement<ScopeBlock> scope = std::make_unique<ScopeBlock>();
 
     if (require_brackets)
         eat(TokenType::LBrace, "expected '{' on scope entry");
@@ -36,7 +36,7 @@ std::unique_ptr<ScopeBlock> Parser::parseScope(bool require_brackets) {
 }
 
 // == PARSE FUNCTIONS ==
-std::unique_ptr<Statement> Parser::parseStatement() {
+std::AsmStatement<Statement> Parser::parseStatement() {
     if (match(TokenType::Semicolon))
         return nullptr;
 
@@ -63,7 +63,7 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return nullptr;
     }
 }
-std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
+std::AsmStatement<VariableDefinition> Parser::parseVariableDeclaration() {
     Token tkn = eat(TokenType::KeywordVartype, "expected variable type for variable declaration");
 
     std::string type_string = tkn.lexeme;
@@ -87,20 +87,20 @@ std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
 
     eat(TokenType::Equal, "expected equals sign for variable declaration");
 
-    std::unique_ptr<Expression> value = parseExpression();
+    std::AsmStatement<Expression> value = parseExpression();
     eat(TokenType::Semicolon, "expected semi colon after variable declaration");
 
     return std::make_unique<VariableDefinition>(tkn.location, type, identifier, std::move(value));
 }
-std::unique_ptr<IfStatement> Parser::parseIfStatement() {
+std::AsmStatement<IfStatement> Parser::parseIfStatement() {
     SourceLocation lct = eat(TokenType::KeywordIf, "expected if keyword for if statement").location;
     eat(TokenType::LParen, "expected '(' after if statement");
-    std::unique_ptr<Expression> condition = parseExpression();
+    std::AsmStatement<Expression> condition = parseExpression();
 
     eat(TokenType::RParen, "expected ')' after if statement condition");
 
-    std::unique_ptr<ScopeBlock> scope = parseScope(true);
-    std::unique_ptr<ConditionalStatement> nextStmt = nullptr;
+    std::AsmStatement<ScopeBlock> scope = parseScope(true);
+    std::AsmStatement<ConditionalStatement> nextStmt = nullptr;
     if (check(TokenType::KeywordElse)) {
         if (peek(1).type == TokenType::KeywordIf) {
             nextStmt = parseElseIfStatement();
@@ -112,11 +112,11 @@ std::unique_ptr<IfStatement> Parser::parseIfStatement() {
     return std::make_unique<IfStatement>(lct, std::move(condition), std::move(scope),
                                          std::move(nextStmt));
 }
-std::unique_ptr<FunctionCallExpr> Parser::parseFunctionCallExpr() {
+std::AsmStatement<FunctionCallExpr> Parser::parseFunctionCallExpr() {
     Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
     std::string identifier = tkn.lexeme;
     eat(TokenType::LParen, "expected '(' after identifier for function call");
-    std::vector<std::unique_ptr<Expression>> args;
+    std::vector<std::AsmStatement<Expression>> args;
 
     while (!isEnd() && !match(TokenType::RParen)) {
         args.push_back(parseExpression());
@@ -132,12 +132,12 @@ std::unique_ptr<FunctionCallExpr> Parser::parseFunctionCallExpr() {
 
     return std::make_unique<FunctionCallExpr>(tkn.location, identifier, std::move(args));
 }
-std::unique_ptr<VariableReassignment> Parser::parseVariableReassignment() {
+std::AsmStatement<VariableReassignment> Parser::parseVariableReassignment() {
     Token tkn = eat(TokenType::Identifier, "expected identifier for variable reassignment");
     std::string identifier = tkn.lexeme;
 
     eat(TokenType::Equal, "expected equal sign after identifier in variable reassignment");
-    std::unique_ptr<VariableReassignment> ptr =
+    std::AsmStatement<VariableReassignment> ptr =
         std::make_unique<VariableReassignment>(tkn.location, identifier, parseExpression());
 
     eat(TokenType::Semicolon, "expected semicolon after statement");
@@ -150,9 +150,8 @@ void Parser::parsePreword() {
     std::string includeName =
         eat(TokenType::Identifier, "expected include name in preword command").lexeme;
     eat(TokenType::GreaterThan, "expected > after include name in preword");
-    includes.push_back(includeName);
 }
-std::unique_ptr<FunctionCallStmt> Parser::parseFunctionCallStmt() {
+std::AsmStatement<FunctionCallStmt> Parser::parseFunctionCallStmt() {
     Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
     std::string identifier = tkn.lexeme;
 
@@ -163,7 +162,7 @@ std::unique_ptr<FunctionCallStmt> Parser::parseFunctionCallStmt() {
     }
 
     eat(TokenType::LParen, "expected '(' after identifier for function call");
-    std::vector<std::unique_ptr<Expression>> args;
+    std::vector<std::AsmStatement<Expression>> args;
 
     while (!isEnd() && !match(TokenType::RParen)) {
         args.push_back(parseExpression());
@@ -180,17 +179,17 @@ std::unique_ptr<FunctionCallStmt> Parser::parseFunctionCallStmt() {
     eat(TokenType::Semicolon, "expected semi colon after function call");
     return std::make_unique<FunctionCallStmt>(tkn.location, identifier, std::move(args));
 }
-std::unique_ptr<ElseIfStatement> Parser::parseElseIfStatement() {
+std::AsmStatement<ElseIfStatement> Parser::parseElseIfStatement() {
     auto lct =
         eat(TokenType::KeywordElse, "expected keyword 'else' for else if statement").location;
     eat(TokenType::KeywordIf, "expected 'if' keyword for else if statement");
     eat(TokenType::LParen, "expected '(' after if statement");
-    std::unique_ptr<Expression> condition = parseExpression();
+    std::AsmStatement<Expression> condition = parseExpression();
 
     eat(TokenType::RParen, "expected ')' after if statement condition");
 
-    std::unique_ptr<ScopeBlock> scope = parseScope(true);
-    std::unique_ptr<ConditionalStatement> nextStmt = nullptr;
+    std::AsmStatement<ScopeBlock> scope = parseScope(true);
+    std::AsmStatement<ConditionalStatement> nextStmt = nullptr;
     if (check(TokenType::KeywordElse)) {
         if (peek(1).type == TokenType::KeywordIf) {
             nextStmt = parseElseIfStatement();
@@ -202,12 +201,12 @@ std::unique_ptr<ElseIfStatement> Parser::parseElseIfStatement() {
     return std::make_unique<ElseIfStatement>(lct, std::move(condition), std::move(scope),
                                              std::move(nextStmt));
 }
-std::unique_ptr<ElseStatement> Parser::parseElseStatement() {
+std::AsmStatement<ElseStatement> Parser::parseElseStatement() {
     auto lct = eat(TokenType::KeywordElse, "expected 'else' keyword for else").location;
-    std::unique_ptr<ScopeBlock> scope = parseScope(true);
+    std::AsmStatement<ScopeBlock> scope = parseScope(true);
     return std::make_unique<ElseStatement>(lct, std::move(scope));
 }
-std::unique_ptr<ForLoop> Parser::parseForLoop() {
+std::AsmStatement<ForLoop> Parser::parseForLoop() {
     eat(TokenType::KeywordFor, "expected 'for' keyword for for loop");
     eat(TokenType::LParen, "expected '(' after 'for' for for loop");
     auto def = parseVariableDeclaration();
@@ -220,7 +219,7 @@ std::unique_ptr<ForLoop> Parser::parseForLoop() {
     return std::make_unique<ForLoop>(std::move(def), std::move(cond), std::move(stmt),
                                      std::move(scope));
 }
-std::unique_ptr<FunctionDefinition> Parser::parseFunctionDefinition() {
+std::AsmStatement<FunctionDefinition> Parser::parseFunctionDefinition() {
     Token tkn = eat(TokenType::KeywordVartype, "expected variable type for function definition");
 
     std::string type_string = tkn.lexeme;
@@ -251,10 +250,10 @@ std::unique_ptr<FunctionDefinition> Parser::parseFunctionDefinition() {
 
 // == EXPRESSION PARSERS ==
 
-std::unique_ptr<Expression> Parser::parseExpression() {
+std::AsmStatement<Expression> Parser::parseExpression() {
     return parseLogicalOr();
 }
-std::unique_ptr<Expression> Parser::parseLogicalOr() {
+std::AsmStatement<Expression> Parser::parseLogicalOr() {
     auto tkn = peek();
     auto node = parseLogicalAnd();
     while (match(TokenType::DoubleStraightLine)) {
@@ -264,7 +263,7 @@ std::unique_ptr<Expression> Parser::parseLogicalOr() {
     }
     return node;
 }
-std::unique_ptr<Expression> Parser::parseLogicalAnd() {
+std::AsmStatement<Expression> Parser::parseLogicalAnd() {
     auto tkn = peek();
     auto node = parseEquality();
     while (match(TokenType::DoubleAmpersand)) {
@@ -274,7 +273,7 @@ std::unique_ptr<Expression> Parser::parseLogicalAnd() {
     }
     return node;
 }
-std::unique_ptr<Expression> Parser::parseEquality() {
+std::AsmStatement<Expression> Parser::parseEquality() {
     auto tkn = peek();
     auto node = parseRelational();
     while (check(TokenType::EqualEqual) || check(TokenType::NotEqual)) {
@@ -288,7 +287,7 @@ std::unique_ptr<Expression> Parser::parseEquality() {
     }
     return node;
 }
-std::unique_ptr<Expression> Parser::parseRelational() {
+std::AsmStatement<Expression> Parser::parseRelational() {
     auto tkn = peek();
     auto node = parseAddition();
     while (check(TokenType::GreaterThan) || check(TokenType::GreaterEqual) ||
@@ -320,7 +319,7 @@ std::unique_ptr<Expression> Parser::parseRelational() {
     }
     return node;
 }
-std::unique_ptr<Expression> Parser::parseAddition() {
+std::AsmStatement<Expression> Parser::parseAddition() {
     auto tkn = peek();
     auto node = parseMultiplication();
     while (check(TokenType::Plus) || check(TokenType::Minus)) {
@@ -336,7 +335,7 @@ std::unique_ptr<Expression> Parser::parseAddition() {
     }
     return node;
 }
-std::unique_ptr<Expression> Parser::parseMultiplication() {
+std::AsmStatement<Expression> Parser::parseMultiplication() {
     auto tkn = peek();
     auto node = parseUnary();
     while (check(TokenType::Star) || check(TokenType::Slash)) {
@@ -352,7 +351,7 @@ std::unique_ptr<Expression> Parser::parseMultiplication() {
 
     return node;
 }
-std::unique_ptr<Expression> Parser::parseUnary() {
+std::AsmStatement<Expression> Parser::parseUnary() {
     auto tkn = peek();
 
     if (match(TokenType::Exclamation)) {
@@ -374,7 +373,7 @@ std::unique_ptr<Expression> Parser::parseUnary() {
 
     return parseFactor();
 }
-std::unique_ptr<Expression> Parser::parseFactor() {
+std::AsmStatement<Expression> Parser::parseFactor() {
     auto tkn = peek();
     if (check(TokenType::LParen)) {
         eat(TokenType::LParen, "expected '('");
@@ -394,7 +393,7 @@ std::unique_ptr<Expression> Parser::parseFactor() {
     }
     return parseLiteral();
 }
-std::unique_ptr<Literal> Parser::parseLiteral() {
+std::AsmStatement<Literal> Parser::parseLiteral() {
     auto token = peek();
     advance();
 
@@ -410,9 +409,9 @@ std::unique_ptr<Literal> Parser::parseLiteral() {
     }
 
     parserPanic("invalid token " + token.lexeme, token.location);
-    return std::unique_ptr<VoidLiteral>();
+    return std::AsmStatement<VoidLiteral>();
 }
-std::unique_ptr<IntegerLiteral> Parser::parseInteger() {
+std::AsmStatement<IntegerLiteral> Parser::parseInteger() {
     bool negative = false;
     if (match(TokenType::Minus)) {
         negative = true;
@@ -421,7 +420,7 @@ std::unique_ptr<IntegerLiteral> Parser::parseInteger() {
     Token tkn = eat(TokenType::IntegerLiteral, "expected integer literal");
     return std::make_unique<IntegerLiteral>(tkn.location, std::stoi(tkn.lexeme));
 }
-std::unique_ptr<FloatLiteral> Parser::parseFloat() {
+std::AsmStatement<FloatLiteral> Parser::parseFloat() {
     bool negative = false;
     if (match(TokenType::Minus)) {
         negative = true;
@@ -430,7 +429,7 @@ std::unique_ptr<FloatLiteral> Parser::parseFloat() {
     Token tkn = eat(TokenType::FloatLiteral, "expected float literal");
     return std::make_unique<FloatLiteral>(tkn.location, std::stof(tkn.lexeme));
 }
-std::unique_ptr<StringLiteral> Parser::parseString() {
+std::AsmStatement<StringLiteral> Parser::parseString() {
     Token tkn = eat(TokenType::StringLiteral, "expected a string literal");
     return std::make_unique<StringLiteral>(tkn.location, tkn.lexeme);
 }
