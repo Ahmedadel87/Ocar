@@ -1,0 +1,58 @@
+# CMake build directories
+build/
+build*/
+cmake-build-*/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+CTestTestfile.cmake
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# Generated build system files
+Makefile
+*.ninja
+.ninja_deps
+.ninja_log
+build.ninja
+rules.ninja
+
+# CPack
+CPackConfig.cmake
+CPackSourceConfig.cmake
+_CPack_Packages/
+
+# Generated libraries/executables (optional)
+*.exe
+*.out
+*.app
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.VC.db
+*.VC.opendb
+
+# CLion
+.idea/
+
+# VS Code (optional)
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Cache files
+.cache/
+.cache/*
+
+# Code files
+code.scl
+output.sh
