@@ -18,45 +18,16 @@ enum class TokenType {
     BoolLiteral,
     NullLiteral,
 
-    Plus,
-    Minus,
-    Star,
-    Slash,
-
-    Equal,
-    EqualEqual,
-    NotEqual,
-    GreaterEqual,
-    LessEqual,
-    GreaterThan,
-    LessThan,
-
     LParen,
     RParen,
     LBrace,
     RBrace,
-
-    Comma,
-    Period,
-
-    Colon,
     Semicolon,
-    Arrow,
-    Ampersand,
-    DoubleAmpersand,
-    StraightLine,
-    DoubleStraightLine,
-    Exclamation,
-    Hashtag,
-    PlusPlus,
-    MinusMinus,
+    EqualSign,
 
-    KeywordIf,
-    KeywordElse,
-    KeywordVartype,
-    KeywordFor,
-
-    PrewordInclude,
+    KeywordRegister,
+    KeywordRoutine,
+    KeywordSection,
 
     EndOfFile
 };
@@ -100,53 +71,36 @@ public:
 
 const std::unordered_map<std::string, TokenType> word_table{
     {{"", TokenType::None},
-     {"if", TokenType::KeywordIf},
-     {"else", TokenType::KeywordElse},
-     {"int", TokenType::KeywordVartype},
-     {"float", TokenType::KeywordVartype},
-     {"string", TokenType::KeywordVartype},
-     {"bool", TokenType::KeywordVartype},
-     {"auto", TokenType::KeywordVartype},
-     {"void", TokenType::KeywordVartype},
-     {"for", TokenType::KeywordFor},
+     {"rtn", TokenType::KeywordRoutine},
+     {"sect", TokenType::KeywordSection},
 
-     {"include", TokenType::PrewordInclude},
+     {"rax", TokenType::KeywordRegister},
+     {"rbx", TokenType::KeywordRegister},
+     {"rcx", TokenType::KeywordRegister},
+     {"rdx", TokenType::KeywordRegister},
+     {"rsi", TokenType::KeywordRegister},
+     {"rdi", TokenType::KeywordRegister},
+     {"rbp", TokenType::KeywordRegister},
+     {"rsp", TokenType::KeywordRegister},
+     {"r8", TokenType::KeywordRegister},
+     {"r9", TokenType::KeywordRegister},
+     {"r10", TokenType::KeywordRegister},
+     {"r11", TokenType::KeywordRegister},
+     {"r12", TokenType::KeywordRegister},
+     {"r13", TokenType::KeywordRegister},
+     {"r14", TokenType::KeywordRegister},
+     {"r15", TokenType::KeywordRegister},
 
      {"true", TokenType::BoolLiteral},
      {"false", TokenType::BoolLiteral},
 
      {"__END_OF_FILE__", TokenType::EndOfFile},
-
-     {"+", TokenType::Plus},
-     {"-", TokenType::Minus},
-     {"*", TokenType::Star},
-     {"/", TokenType::Slash},
-
-     {"=", TokenType::Equal},
-     {"==", TokenType::EqualEqual},
-     {"!=", TokenType::NotEqual},
-
      {"(", TokenType::LParen},
      {")", TokenType::RParen},
      {"{", TokenType::LBrace},
      {"}", TokenType::RBrace},
-     {"&", TokenType::Ampersand},
-     {":", TokenType::Colon},
      {";", TokenType::Semicolon},
-     {"->", TokenType::Arrow},
-     {"!", TokenType::Exclamation},
-     {">", TokenType::GreaterThan},
-     {"<", TokenType::LessThan},
-     {">=", TokenType::GreaterEqual},
-     {"<=", TokenType::LessEqual},
-     {",", TokenType::Comma},
-     {"#", TokenType::Hashtag},
-     {".", TokenType::Period},
-     {",", TokenType::Comma},
-     {"++", TokenType::PlusPlus},
-     {"--", TokenType::MinusMinus},
-     {"||", TokenType::DoubleStraightLine},
-     {"&&", TokenType::DoubleAmpersand}}};
+     {"=", TokenType::EqualSign}}};
 const std::array<std::string, 3> registers = {"rax", "rdi", "rsi"};
 
 struct ExpressionInfo {
