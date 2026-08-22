@@ -22,8 +22,10 @@ enum class TokenType {
     RParen,
     LBrace,
     RBrace,
+    Comma,
     Semicolon,
     EqualSign,
+    Minus,
 
     KeywordRegister,
     KeywordRoutine,
@@ -100,8 +102,9 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"{", TokenType::LBrace},
      {"}", TokenType::RBrace},
      {";", TokenType::Semicolon},
+     {"-", TokenType::Minus},
+     {",", TokenType::Comma},
      {"=", TokenType::EqualSign}}};
-const std::array<std::string, 3> registers = {"rax", "rdi", "rsi"};
 
 struct ExpressionInfo {
     VariableType type;
@@ -196,19 +199,6 @@ public:
 
     ConditionalStatement(const SourceLocation& lct) : Statement(lct) {}
 };
-class IfStatement : public ConditionalStatement {
-public:
-    std::unique_ptr<Expression> condition;
-    std::unique_ptr<ScopeBlock> block;
-    std::unique_ptr<ConditionalStatement> nextStatement;
-    void accept(Visitor& visitor) override;
-
-    IfStatement(const SourceLocation& lct, std::unique_ptr<Expression> condition_,
-                std::unique_ptr<ScopeBlock> block_,
-                std::unique_ptr<ConditionalStatement> nextStatement_)
-        : ConditionalStatement(lct), condition(std::move(condition_)), block(std::move(block_)),
-          nextStatement(std::move(nextStatement_)) {}
-};
 class VariableDefinition : public Statement {
 public:
     VariableType type;
@@ -241,40 +231,6 @@ public:
     FunctionCallStmt(SourceLocation& src, const std::string& identifier_,
                      std::vector<std::unique_ptr<Expression>> args_)
         : Statement(src), identifier(identifier_), args(std::move(args_)) {}
-};
-class ElseIfStatement : public ConditionalStatement {
-public:
-    std::unique_ptr<Expression> condition;
-    std::unique_ptr<ScopeBlock> block;
-    std::unique_ptr<ConditionalStatement> nextStatement;
-    void accept(Visitor& visitor) override;
-
-    ElseIfStatement(const SourceLocation& lct, std::unique_ptr<Expression> condition_,
-                    std::unique_ptr<ScopeBlock> block_,
-                    std::unique_ptr<ConditionalStatement> nextStatement_)
-        : ConditionalStatement(lct), condition(std::move(condition_)), block(std::move(block_)),
-          nextStatement(std::move(nextStatement_)) {}
-};
-class ElseStatement : public ConditionalStatement {
-public:
-    std::unique_ptr<ScopeBlock> block;
-    void accept(Visitor& visitor) override;
-
-    ElseStatement(const SourceLocation& lct, std::unique_ptr<ScopeBlock> block_)
-        : ConditionalStatement(lct), block(std::move(block_)) {}
-};
-class ForLoop : public Statement {
-public:
-    std::unique_ptr<VariableDefinition> definition;
-    std::unique_ptr<Expression> condition;
-    std::unique_ptr<Statement> then_do;
-    std::unique_ptr<ScopeBlock> scope;
-    void accept(Visitor& visitor) override;
-
-    ForLoop(std::unique_ptr<VariableDefinition> definition_, std::unique_ptr<Expression> condition_,
-            std::unique_ptr<Statement> then_do_, std::unique_ptr<ScopeBlock> scope_ = nullptr)
-        : definition(std::move(definition_)), condition(std::move(condition_)),
-          then_do(std::move(then_do_)), scope(std::move(scope_)) {}
 };
 class FunctionDefinition : public Statement {
 public:
@@ -341,15 +297,11 @@ public:
     virtual void visit(VoidLiteral& node) = 0;
     virtual void visit(VariableDefinition& node) = 0;
     virtual void visit(BinaryExpression& node) = 0;
-    virtual void visit(IfStatement& node) = 0;
     virtual void visit(FunctionCallExpr& node) = 0;
     virtual void visit(VariableReference& node) = 0;
     virtual void visit(UnaryExpression& node) = 0;
     virtual void visit(VariableReassignment& node) = 0;
     virtual void visit(FunctionCallStmt& node) = 0;
-    virtual void visit(ElseIfStatement& node) = 0;
-    virtual void visit(ElseStatement& node) = 0;
-    virtual void visit(ForLoop& node) = 0;
     virtual void visit(FunctionDefinition& node) = 0;
 };
 class PrettyPrinter : public Visitor {
@@ -369,15 +321,11 @@ public:
     void visit(VoidLiteral& node) override;
     void visit(VariableDefinition& node) override;
     void visit(BinaryExpression& node) override;
-    void visit(IfStatement& node) override;
     void visit(FunctionCallExpr& node) override;
     void visit(VariableReference& node) override;
     void visit(UnaryExpression& node) override;
     void visit(VariableReassignment& node) override;
     void visit(FunctionCallStmt& node) override;
-    void visit(ElseIfStatement& node) override;
-    void visit(ElseStatement& node) override;
-    void visit(ForLoop& node) override;
     void visit(FunctionDefinition& node) override;
 };
 
@@ -405,9 +353,6 @@ inline void VariableDefinition::accept(Visitor& visitor) {
 inline void BinaryExpression::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
-inline void IfStatement::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
 inline void FunctionCallExpr::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
@@ -421,15 +366,6 @@ inline void VariableReassignment::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void FunctionCallStmt::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-inline void ElseIfStatement::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-inline void ElseStatement::accept(Visitor& visitor) {
-    visitor.visit(*this);
-}
-inline void ForLoop::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void FunctionDefinition::accept(Visitor& visitor) {

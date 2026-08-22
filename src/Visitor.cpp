@@ -45,17 +45,6 @@ void PrettyPrinter::visit(BinaryExpression& node) {
     node.right->accept(*this);
     indent--;
 }
-void PrettyPrinter::visit(IfStatement& node) {
-    printIndent();
-
-    stream << "IfStatement\n";
-    indent++;
-    node.condition->accept(*this);
-    node.block->accept(*this);
-    if (node.nextStatement != nullptr)
-        node.nextStatement->accept(*this);
-    indent--;
-}
 void PrettyPrinter::visit(FunctionCallExpr& node) {
     printIndent();
     stream << "FunctionCall " << node.identifier << std::endl;
@@ -114,34 +103,6 @@ void PrettyPrinter::visit(FunctionCallStmt& node) {
     for (auto& arg : node.args) {
         arg->accept(*this);
     }
-    indent--;
-}
-void PrettyPrinter::visit(ElseIfStatement& node) {
-    printIndent();
-
-    stream << "ElseIfStatement\n";
-    indent++;
-    node.condition->accept(*this);
-    node.block->accept(*this);
-    if (node.nextStatement != nullptr)
-        node.nextStatement->accept(*this);
-    indent--;
-}
-void PrettyPrinter::visit(ElseStatement& node) {
-    printIndent();
-    stream << "ElseStatement\n";
-    indent++;
-    node.block->accept(*this);
-    indent--;
-}
-void PrettyPrinter::visit(ForLoop& node) {
-    printIndent();
-    stream << "ForLoop\n";
-    indent++;
-    node.definition->accept(*this);
-    node.condition->accept(*this);
-    node.then_do->accept(*this);
-    node.scope->accept(*this);
     indent--;
 }
 void PrettyPrinter::visit(FunctionDefinition& node) {

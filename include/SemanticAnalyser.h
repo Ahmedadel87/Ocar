@@ -51,15 +51,11 @@ public:
     void visit(VoidLiteral& node) override;
     void visit(VariableDefinition& node) override;
     void visit(BinaryExpression& node) override;
-    void visit(IfStatement& node) override;
     void visit(FunctionCallExpr& node) override;
     void visit(VariableReference& node) override;
     void visit(UnaryExpression& node) override;
     void visit(VariableReassignment& node) override;
     void visit(FunctionCallStmt& node) override;
-    void visit(ElseIfStatement& node) override;
-    void visit(ElseStatement& node) override;
-    void visit(ForLoop& node) override;
     void visit(FunctionDefinition& node) override;
 
     std::unique_ptr<ScopeBlock> hand_over_AST();

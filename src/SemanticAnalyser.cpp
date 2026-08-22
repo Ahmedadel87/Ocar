@@ -184,12 +184,6 @@ void SemanticAnalyser::visit(VoidLiteral& node) {}
 void SemanticAnalyser::visit(BinaryExpression& node) {
     analyseExpression(&node);
 }
-void SemanticAnalyser::visit(IfStatement& node) {
-    node.condition->accept(*this);
-    node.block->accept(*this);
-    if (node.nextStatement != nullptr)
-        node.nextStatement->accept(*this);
-}
 void SemanticAnalyser::visit(FunctionCallExpr& node) {
     if (commandIncluded(node.identifier) && !symbolExists(node.identifier)) {
         addSymbol(Symbol(node.identifier, SymbolKind::Function, VariableType::STRING,
@@ -289,21 +283,6 @@ void SemanticAnalyser::visit(FunctionCallStmt& node) {
             semaPanic("argument is not of the requested type", node.args.at(i).get()->location);
         arg->accept(*this);
     }
-}
-void SemanticAnalyser::visit(ElseIfStatement& node) {
-    node.condition->accept(*this);
-    node.block->accept(*this);
-    if (node.nextStatement != nullptr)
-        node.nextStatement->accept(*this);
-}
-void SemanticAnalyser::visit(ElseStatement& node) {
-    node.block->accept(*this);
-}
-void SemanticAnalyser::visit(ForLoop& node) {
-    node.definition->accept(*this);
-    node.condition->accept(*this);
-    node.then_do->accept(*this);
-    node.scope->accept(*this);
 }
 void SemanticAnalyser::visit(FunctionDefinition& node) {
     addSymbol(Symbol(node.identifier, SymbolKind::Function, VariableType::VOID,
