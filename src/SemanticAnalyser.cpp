@@ -28,86 +28,38 @@ void SemanticAnalyser::semaPanic(const std::string& msg, SourceLocation src) {
 }
 ExpressionInfo SemanticAnalyser::analyseExpression(Expression* expr) {
     if (auto lt = dynamic_cast<StringLiteral*>(expr)) {
-        expr->return_type = VariableType::STRING;
-        return ExpressionInfo(VariableType::STRING, false, true);
+        return ExpressionInfo(false, true);
     } else if (auto lt = dynamic_cast<IntegerLiteral*>(expr)) {
-        expr->return_type = VariableType::INT;
-        return ExpressionInfo(VariableType::INT, false, true);
+        return ExpressionInfo(false, true);
     } else if (auto lt = dynamic_cast<FloatLiteral*>(expr)) {
-        expr->return_type = VariableType::FLOAT;
-        return ExpressionInfo(VariableType::FLOAT, false, true);
+        return ExpressionInfo(false, true);
     } else if (auto lt = dynamic_cast<BooleanLiteral*>(expr)) {
-        expr->return_type = VariableType::BOOL;
-        return ExpressionInfo(VariableType::BOOL, false, true);
+        return ExpressionInfo(false, true);
     } else if (auto lt = dynamic_cast<VoidLiteral*>(expr)) {
-        expr->return_type = VariableType::VOID;
-        return ExpressionInfo(VariableType::VOID, false, true);
+        return ExpressionInfo(false, true);
     } else if (auto var = dynamic_cast<VariableReference*>(expr)) {
-        const Symbol* symbol = getSymbol(var->identifier);
-        if (symbol == nullptr)
-            semaPanic("undeclared variable \"" + var->identifier + "\"", var->location);
-        expr->return_type = symbol->type;
-        return ExpressionInfo(symbol->type, true, false);
+        return ExpressionInfo(true, false);
     } else if (auto func = dynamic_cast<FunctionCallExpr*>(expr)) {
         const Symbol* symbol = getSymbol(func->identifier);
         if (symbol == nullptr)
             semaPanic("undeclared function \"" + func->identifier + "\"", func->location);
-        expr->return_type = symbol->type;
-        return ExpressionInfo(symbol->type, false, true);
+        return ExpressionInfo(false, true);
     } else if (auto bexpr = dynamic_cast<BinaryExpression*>(expr)) {
         auto leftInfo = analyseExpression(bexpr->left.get());
         auto rightInfo = analyseExpression(bexpr->right.get());
 
-        if (leftInfo.type == VariableType::VOID || rightInfo.type == VariableType::VOID) {
-            semaPanic("variable of type void cannot be used in binary expression", bexpr->location);
-        }
-
-        VariableType returnType = leftInfo.type;
-        if (leftInfo.type != rightInfo.type) {
-            if (leftInfo.type == VariableType::INT && rightInfo.type == VariableType::FLOAT) {
-                returnType = VariableType::FLOAT; // floats have higher "precedence"
-                goto validOperation;
-            }
-            if (leftInfo.type == VariableType::FLOAT && rightInfo.type == VariableType::INT) {
-                returnType = VariableType::FLOAT;
-                goto validOperation;
-            }
-
-            semaPanic("invalid operation between types", bexpr->location);
-        }
-    validOperation:
-        switch (bexpr->op) {
-            case BinaryOperation::GREATER_THAN:
-            case BinaryOperation::GREATER_THAN_OR_EQUAL:
-            case BinaryOperation::LESS_THAN:
-            case BinaryOperation::LESS_THAN_OR_EQUAL:
-            case BinaryOperation::EQUALS:
-            case BinaryOperation::NOT_EQUALS:
-                returnType = VariableType::BOOL;
-                break;
-
-            default:
-                break;
-        }
-        expr->return_type = returnType;
-        return ExpressionInfo(returnType, false, true);
+        return ExpressionInfo(false, true);
     } else if (auto uxpr = dynamic_cast<UnaryExpression*>(expr)) {
         uxpr->value->accept(*this);
-        if (uxpr->op == UnaryOperation::COMPLEMENT && uxpr->return_type != VariableType::BOOL) {
-            semaPanic("cannot get the logical inverse of a non-booelan expression", uxpr->location);
-        }
         if ((uxpr->op == UnaryOperation::DECREMENT || uxpr->op == UnaryOperation::INCREMENT ||
-             uxpr->op == UnaryOperation::NEGATE) &&
-            (uxpr->value->return_type != VariableType::INT &&
-             uxpr->value->return_type != VariableType::FLOAT)) {
+             uxpr->op == UnaryOperation::NEGATE)) {
             semaPanic("cannot decrement/increment/negate non-integer/float value");
         }
-        uxpr->return_type = uxpr->value->return_type;
-        return ExpressionInfo(uxpr->return_type, false, true);
+        return ExpressionInfo(false, true);
     } else {
         semaPanic("invalid expression", expr->location);
     }
-    return ExpressionInfo(VariableType::VOID);
+    return ExpressionInfo();
 }
 bool SemanticAnalyser::commandExists(const std::string& cmd) {
     size_t pos = cmd.find('.');
@@ -145,16 +97,6 @@ bool SemanticAnalyser::symbolExists(const std::string& identifier) const {
     }
     return false;
 }
-VariableType SemanticAnalyser::getSymbolType(const std::string& identifier) const {
-    Scope* scp = stack.back().get();
-    while (scp != nullptr) {
-        if (scp->symbols.contains(identifier))
-            return scp->symbols[identifier]->type;
-
-        scp = scp->parent;
-    }
-    return VariableType::VOID;
-}
 const Symbol* SemanticAnalyser::getSymbol(const std::string& identifier) const {
     Scope* scp = stack.back().get();
     while (scp != nullptr) {
@@ -185,10 +127,6 @@ void SemanticAnalyser::visit(BinaryExpression& node) {
     analyseExpression(&node);
 }
 void SemanticAnalyser::visit(FunctionCallExpr& node) {
-    if (commandIncluded(node.identifier) && !symbolExists(node.identifier)) {
-        addSymbol(Symbol(node.identifier, SymbolKind::Function, VariableType::STRING,
-                         std::vector<VariableType>{VariableType::ANY}));
-    }
     if (!symbolExists(node.identifier)) {
         semaPanic("cannot reference function \"" + node.identifier + "\"; it does not exist.",
                   node.location);
@@ -198,20 +136,12 @@ void SemanticAnalyser::visit(FunctionCallExpr& node) {
                   node.location);
     }
 
-    auto params = getSymbol(node.identifier)->parameters;
-    for (int i = 0; i < params.size(); i++) {
-        if (node.args.size() <= i) {
-            semaPanic("less arguments than requested");
-        }
-        if (node.args.size() > params.size()) {
-            semaPanic("more arguments than requested");
-        }
-
-        auto arg = node.args.at(i).get();
-        analyseExpression(arg);
-        if (arg->return_type != params[i] && params[i] != VariableType::ANY)
-            semaPanic("argument is not of the requested type", node.args.at(i).get()->location);
-        arg->accept(*this);
+    auto paramCount = getSymbol(node.identifier)->paramCount;
+    if (node.args.size() < paramCount) {
+        semaPanic("less arguments than requested");
+    }
+    if (node.args.size() > paramCount) {
+        semaPanic("more arguments than requested");
     }
 }
 void SemanticAnalyser::visit(VariableReference& node) {
@@ -234,31 +164,14 @@ void SemanticAnalyser::visit(VariableReassignment& node) {
         semaPanic("\"" + node.identifier + "\" is used as a variable even though it is a function",
                   node.location);
     }
-
-    if (getSymbolType(node.identifier) != analyseExpression(node.value.get()).type) {
-        semaPanic("reassignment type does not match variable type", node.location);
-    }
 }
 void SemanticAnalyser::visit(VariableDefinition& node) {
-    ExpressionInfo info = analyseExpression(node.value.get());
-    if (node.type == VariableType::VOID)
-        node.type = info.type;
-
-    addSymbol(
-        Symbol(node.identifier, SymbolKind::Variable, node.type, std::vector<VariableType>()));
-
-    if (node.type != info.type) {
-        semaPanic("variable type does not match assigned value", node.location);
-    }
+    addSymbol(Symbol(node.identifier, SymbolKind::Variable));
 }
 void SemanticAnalyser::visit(UnaryExpression& node) {
     node.value->accept(*this);
 }
 void SemanticAnalyser::visit(FunctionCallStmt& node) {
-    if (commandIncluded(node.identifier) && !symbolExists(node.identifier)) {
-        addSymbol(Symbol(node.identifier, SymbolKind::Function, VariableType::STRING,
-                         std::vector<VariableType>{VariableType::ANY}));
-    }
     if (!symbolExists(node.identifier)) {
         semaPanic("cannot reference function \"" + node.identifier + "\"; it does not exist.",
                   node.location);
@@ -268,24 +181,15 @@ void SemanticAnalyser::visit(FunctionCallStmt& node) {
                   node.location);
     }
 
-    auto params = getSymbol(node.identifier)->parameters;
-    for (int i = 0; i < params.size(); i++) {
-        if (node.args.size() <= i) {
-            semaPanic("less arguments than requested");
-        }
-        if (node.args.size() > params.size()) {
-            semaPanic("more arguments than requested");
-        }
-
-        auto arg = node.args.at(i).get();
-        analyseExpression(arg);
-        if (arg->return_type != params[i] && params[i] != VariableType::ANY)
-            semaPanic("argument is not of the requested type", node.args.at(i).get()->location);
-        arg->accept(*this);
+    auto paramCount = getSymbol(node.identifier)->paramCount;
+    if (node.args.size() < paramCount) {
+        semaPanic("less arguments than requested");
+    }
+    if (node.args.size() > paramCount) {
+        semaPanic("more arguments than requested");
     }
 }
 void SemanticAnalyser::visit(FunctionDefinition& node) {
-    addSymbol(Symbol(node.identifier, SymbolKind::Function, VariableType::VOID,
-                     std::vector<VariableType>{}));
+    addSymbol(Symbol(node.identifier, SymbolKind::Function));
     node.scope->accept(*this);
 }

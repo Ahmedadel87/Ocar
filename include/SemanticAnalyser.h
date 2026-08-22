@@ -11,12 +11,10 @@ enum class SymbolKind { Variable, Function };
 struct Symbol {
     std::string identifier;
     SymbolKind kind;
-    VariableType type;
-    std::vector<VariableType> parameters;
+    int paramCount = 0;
 
-    Symbol(const std::string& identifier_, SymbolKind kind_, VariableType type_,
-           std::vector<VariableType> parameters_)
-        : identifier(identifier_), kind(kind_), type(type_), parameters(parameters_) {}
+    Symbol(const std::string& identifier_, SymbolKind kind_, int paramCount_ = 0)
+        : identifier(identifier_), kind(kind_), paramCount(paramCount_) {}
 };
 
 class SemanticAnalyser : public Visitor {
@@ -37,7 +35,6 @@ class SemanticAnalyser : public Visitor {
     bool commandIncluded(const std::string& cmd);
     bool commandExists(const std::string& cmd);
     bool symbolExists(const std::string& identifier) const;
-    VariableType getSymbolType(const std::string& identifier) const;
     const Symbol* getSymbol(const std::string& identifier) const;
 
     ExpressionInfo analyseExpression(Expression* expr);

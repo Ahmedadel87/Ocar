@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-enum class VariableType { ANY, INT, FLOAT, STRING, CHAR, BOOL, VOID };
-
 enum class TokenType {
     None,
 
@@ -107,12 +105,11 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"=", TokenType::EqualSign}}};
 
 struct ExpressionInfo {
-    VariableType type;
     bool isLValue = false;
     bool isConstant = false;
 
-    ExpressionInfo(VariableType type_, bool isLValue_ = false, bool isConstant_ = false)
-        : type(type_), isLValue(isLValue_), isConstant(isConstant_) {}
+    ExpressionInfo(bool isLValue_ = false, bool isConstant_ = false)
+        : isLValue(isLValue_), isConstant(isConstant_) {}
 };
 
 class Visitor;
@@ -134,7 +131,6 @@ public:
 
 class Expression : public ASTNode {
 public:
-    VariableType return_type = VariableType::VOID; // invalid until annotated by the ast
     SourceLocation location;
 
     virtual ~Expression() = default;
@@ -201,14 +197,14 @@ public:
 };
 class VariableDefinition : public Statement {
 public:
-    VariableType type;
     std::string identifier;
+    std::string memory;
     std::unique_ptr<Expression> value;
     void accept(Visitor& visitor) override;
 
-    VariableDefinition(SourceLocation& src, VariableType& type_, const std::string& identifier_,
+    VariableDefinition(SourceLocation& src, std::string& memory_, const std::string& identifier_,
                        std::unique_ptr<Expression> value_)
-        : Statement(src), type(type_), identifier(identifier_), value(std::move(value_)) {}
+        : Statement(src), memory(memory_), identifier(identifier_), value(std::move(value_)) {}
 };
 class VariableReassignment : public Statement {
 public:

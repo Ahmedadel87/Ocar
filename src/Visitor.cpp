@@ -28,7 +28,7 @@ void PrettyPrinter::visit(VariableDefinition& node) {
     printIndent();
     stream << "Identifier(" << node.identifier << ")\n";
     printIndent();
-    stream << "Type(" << (int)node.type << ")\n";
+    stream << "Memory(" << node.memory << ")\n";
     node.value->accept(*this);
     indent--;
 }

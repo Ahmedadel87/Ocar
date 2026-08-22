@@ -14,6 +14,9 @@ std::unique_ptr<ScopeBlock> Parser::hand_over_AST() {
 void Parser::parse() {
     cursor = 0;
     entry_point = parseScope(false);
+
+    PrettyPrinter pretty(std::cout);
+    entry_point->accept(pretty);
 }
 std::unique_ptr<ScopeBlock> Parser::parseScope(bool require_brackets) {
     std::unique_ptr<ScopeBlock> scope = std::make_unique<ScopeBlock>();
@@ -50,23 +53,9 @@ std::unique_ptr<Statement> Parser::parseStatement() {
     }
 }
 std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
-    Token tkn = eat(TokenType::KeywordRegister, "expected variable type for variable declaration");
+    Token tkn = eat(TokenType::KeywordRegister, "expected memory name for variable declaration");
 
     std::string type_string = tkn.lexeme;
-    VariableType type = VariableType::VOID;
-
-    if (type_string == "int")
-        type = VariableType::INT;
-    else if (type_string == "string")
-        type = VariableType::STRING;
-    else if (type_string == "float")
-        type = VariableType::FLOAT;
-    else if (type_string == "bool")
-        type = VariableType::BOOL;
-    else if (type_string == "auto")
-        type = VariableType::VOID;
-    else
-        parserPanic("invalid type \"" + type_string + "\"", tkn.location);
 
     std::string identifier =
         eat(TokenType::Identifier, "expected identifier for variable declaration").lexeme;
@@ -76,7 +65,8 @@ std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
     std::unique_ptr<Expression> value = parseExpression();
     eat(TokenType::Semicolon, "expected semi colon after variable declaration");
 
-    return std::make_unique<VariableDefinition>(tkn.location, type, identifier, std::move(value));
+    return std::make_unique<VariableDefinition>(tkn.location, type_string, identifier,
+                                                std::move(value));
 }
 std::unique_ptr<FunctionCallExpr> Parser::parseFunctionCallExpr() {
     Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
@@ -133,25 +123,9 @@ std::unique_ptr<FunctionCallStmt> Parser::parseFunctionCallStmt() {
 }
 
 std::unique_ptr<FunctionDefinition> Parser::parseFunctionDefinition() {
-    Token tkn = eat(TokenType::KeywordRegister, "expected variable type for function definition");
+    Token tkn = eat(TokenType::KeywordRegister, "expected memory name for function definition");
 
     std::string type_string = tkn.lexeme;
-    VariableType type = VariableType::VOID;
-
-    if (type_string == "int")
-        type = VariableType::INT;
-    else if (type_string == "string")
-        type = VariableType::STRING;
-    else if (type_string == "float")
-        type = VariableType::FLOAT;
-    else if (type_string == "bool")
-        type = VariableType::BOOL;
-    else if (type_string == "auto")
-        type = VariableType::VOID;
-    else if (type_string == "void")
-        type = VariableType::VOID;
-    else
-        parserPanic("invalid type \"" + type_string + "\"", tkn.location);
 
     std::string identifier = eat(TokenType::Identifier, "expected function identifier").lexeme;
     eat(TokenType::LParen, "expected '(' after identifier for function definition");
@@ -162,7 +136,6 @@ std::unique_ptr<FunctionDefinition> Parser::parseFunctionDefinition() {
 }
 
 // == EXPRESSION PARSERS ==
-
 std::unique_ptr<Expression> Parser::parseExpression() {
     return parseFactor();
 }
