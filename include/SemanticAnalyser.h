@@ -32,6 +32,7 @@ class SemanticAnalyser : public Visitor {
     void enter_scope();
     void exit_scope();
     void addSymbol(const Symbol& symbol);
+    void removeSymbol(const std::string& identifier);
     void semaPanic(const std::string& msg, SourceLocation src = SourceLocation());
 
     void push_active_memory(const std::string& memname, const std::string& varname);

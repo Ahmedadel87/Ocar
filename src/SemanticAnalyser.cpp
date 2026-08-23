@@ -95,6 +95,15 @@ const Symbol* SemanticAnalyser::getSymbol(const std::string& identifier) const {
     }
     return nullptr;
 }
+void SemanticAnalyser::removeSymbol(const std::string& identifier) {
+    Scope* scp = stack.back().get();
+    while (scp != nullptr) {
+        if (scp->symbols.contains(identifier))
+            scp->symbols.erase(identifier);
+        scp = scp->parent;
+    }
+    semaPanic("Internal, cannot erase symbol \"" + identifier + "\"; it does not exist");
+}
 
 void SemanticAnalyser::push_active_memory(const std::string& memname, const std::string& varname) {
     activeMemory.push_back(std::pair<std::string, std::string>(memname, varname));
@@ -247,10 +256,11 @@ void SemanticAnalyser::visit(DeleteVariable& node) {
     if (!symbolExists(node.identifier))
         semaPanic("cannot delete \"" + node.identifier + "\"; it is not declared");
 
-    if (getSymbol(node.identifier)->kind != SymbolKind::Variable)
-        semaPanic("cannot delete \"" + node.identifier + "\"; it is not a variable");
+    removeSymbol(node.identifier);
 
-    stack.back()->symbols.erase(node.identifier);
+    if (getSymbol(node.identifier)->kind != SymbolKind::Variable)
+        return; // if it's not a variable, it's not in active memory
+
     auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
                            [&](const auto& p) { return p.second == node.identifier; });
 
