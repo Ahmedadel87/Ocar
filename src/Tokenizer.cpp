@@ -112,6 +112,17 @@ void Tokenizer::tokenize(const std::string& c) {
             }
             token(get_word_type(str), str, location);
             continue;
+        } else if (current() == '@') { // direct conversion "operator"
+            advance();
+            std::string str;
+            while (!eof() && current() != '\n') {
+                assert_validity(cursor);
+                str += current();
+                advance();
+            }
+
+            token(TokenType::AsmInstruction, str, location);
+            continue;
         } else if (is_character(current())) {
             std::string str;
 

@@ -20,6 +20,7 @@ private:
     void instr_print(IrRtnCall* ins, std::ostream& stream);
     void instr_print(IrGlobal* ins, std::ostream& stream);
     void instr_print(IrSection* ins, std::ostream& stream);
+    void instr_print(IrAsm* ins, std::ostream& stream);
 
     void instr_print(IrIntLit* ins, std::ostream& stream);
 

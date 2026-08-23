@@ -64,3 +64,6 @@ void casmlang::IrGenerator::visit(Global& node) {
     ir.push_back(std::make_unique<IrGlobal>(node.identifier));
 }
 void casmlang::IrGenerator::visit(RoutineDeclaration& node) {}
+void casmlang::IrGenerator::visit(AsmInstruction& node) {
+    ir.push_back(std::make_unique<IrAsm>(node.instruction));
+}

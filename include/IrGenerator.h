@@ -98,6 +98,16 @@ public:
         stream << "section ." << text;
     }
 };
+class IrAsm : public IrStmt {
+public:
+    std::string instruction;
+
+    IrAsm(const std::string& instruction_) : instruction(instruction_) {}
+
+    void print(std::ostream& stream) const override {
+        stream << "@" << instruction;
+    }
+};
 
 class IrGenerator : public Visitor {
 private:
@@ -148,6 +158,7 @@ public:
     void visit(SectionDefinition& node) override;
     void visit(Global& node) override;
     void visit(RoutineDeclaration& node) override;
+    void visit(AsmInstruction& node) override;
 };
 
 } // namespace casmlang

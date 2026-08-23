@@ -242,3 +242,4 @@ void SemanticAnalyser::visit(Global& node) {
 void SemanticAnalyser::visit(RoutineDeclaration& node) {
     addSymbol(Symbol(node.identifier, SymbolKind::Routine));
 }
+void SemanticAnalyser::visit(AsmInstruction& node) {}

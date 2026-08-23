@@ -53,7 +53,11 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseSectionDefinition();
     else if (check(TokenType::KeywordGlobal))
         return parseGlobal();
-    else {
+    else if (check(TokenType::AsmInstruction)) { // not worth its own function
+        auto instr = peek().lexeme;
+        advance();
+        return std::make_unique<AsmInstruction>(instr);
+    } else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
     }

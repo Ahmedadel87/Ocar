@@ -16,6 +16,8 @@ enum class TokenType {
     BoolLiteral,
     NullLiteral,
 
+    AsmInstruction,
+
     LParen,
     RParen,
     LBrace,
@@ -24,6 +26,7 @@ enum class TokenType {
     Semicolon,
     EqualSign,
     Minus,
+    SnailSign,
 
     KeywordRegister,
     KeywordRoutine,
@@ -105,6 +108,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {";", TokenType::Semicolon},
      {"-", TokenType::Minus},
      {",", TokenType::Comma},
+     {"@", TokenType::SnailSign},
      {"=", TokenType::EqualSign}}};
 struct ExpressionInfo {
     bool isLValue = false;
@@ -269,6 +273,13 @@ public:
 
     void accept(Visitor& visitor) override;
 };
+class AsmInstruction : public Statement {
+public:
+    std::string instruction;
+    void accept(Visitor& visitor) override;
+
+    AsmInstruction(const std::string& instruction_) : instruction(instruction_) {}
+};
 
 class Literal : public Expression {
 public:
@@ -333,6 +344,7 @@ public:
     virtual void visit(SectionDefinition& node) = 0;
     virtual void visit(Global& node) = 0;
     virtual void visit(RoutineDeclaration& node) = 0;
+    virtual void visit(AsmInstruction& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -360,6 +372,7 @@ public:
     void visit(SectionDefinition& node) override;
     void visit(Global& node) override;
     void visit(RoutineDeclaration& node) override;
+    void visit(AsmInstruction& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -411,5 +424,8 @@ inline void Global::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void RoutineDeclaration::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void AsmInstruction::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

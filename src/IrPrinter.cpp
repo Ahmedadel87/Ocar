@@ -24,6 +24,8 @@ void IrPrinter::dispatch_print(Ir* instr, std::ostream& stream) {
         instr_print(cst, stream);
     else if (auto cst = dynamic_cast<IrSection*>(instr))
         instr_print(cst, stream);
+    else if (auto cst = dynamic_cast<IrAsm*>(instr))
+        instr_print(cst, stream);
     else
         panic("Internal, invalid print dispatch for instruction");
 }
@@ -58,6 +60,10 @@ void IrPrinter::instr_print(IrSection* ins, std::ostream& stream) {
     print_indent(stream);
     stream << "section ." << ins->text;
     indent++;
+}
+void IrPrinter::instr_print(IrAsm* ins, std::ostream& stream) {
+    print_indent(stream);
+    stream << ins->instruction << " ; direct conversion";
 }
 
 void IrPrinter::instr_print(IrIntLit* ins, std::ostream& stream) {

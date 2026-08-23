@@ -125,3 +125,6 @@ void PrettyPrinter::visit(Global& node) {
 void PrettyPrinter::visit(RoutineDeclaration& node) {
     stream << "FunctionDeclaration " << node.identifier;
 }
+void PrettyPrinter::visit(AsmInstruction& node) {
+    stream << "raw instruction: " << node.instruction;
+}
