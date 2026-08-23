@@ -45,7 +45,7 @@ void PrettyPrinter::visit(BinaryExpression& node) {
     node.right->accept(*this);
     indent--;
 }
-void PrettyPrinter::visit(FunctionCallExpr& node) {
+void PrettyPrinter::visit(RoutineCallExpr& node) {
     printIndent();
     stream << "FunctionCall " << node.identifier << std::endl;
 
@@ -95,7 +95,7 @@ void PrettyPrinter::visit(VariableReassignment& node) {
     node.value->accept(*this);
     indent--;
 }
-void PrettyPrinter::visit(FunctionCallStmt& node) {
+void PrettyPrinter::visit(RoutineCallStmt& node) {
     printIndent();
     stream << "FunctionCallStatement " << node.identifier << "\n";
 
@@ -105,7 +105,7 @@ void PrettyPrinter::visit(FunctionCallStmt& node) {
     }
     indent--;
 }
-void PrettyPrinter::visit(FunctionDefinition& node) {
+void PrettyPrinter::visit(RoutineDefinition& node) {
     printIndent();
     stream << "FunctionDefinition " << node.identifier << "\n";
     indent++;

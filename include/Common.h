@@ -147,14 +147,14 @@ public:
                      std::unique_ptr<Expression> r)
         : Expression(src), left(std::move(l)), op(op_), right(std::move(r)) {}
 };
-class FunctionCallExpr : public Expression {
+class RoutineCallExpr : public Expression {
 public:
     std::string identifier;
     std::vector<std::unique_ptr<Expression>> args;
 
     void accept(Visitor& visitor) override;
-    FunctionCallExpr(const SourceLocation& src, const std::string& identifier_,
-                     std::vector<std::unique_ptr<Expression>> args_)
+    RoutineCallExpr(const SourceLocation& src, const std::string& identifier_,
+                    std::vector<std::unique_ptr<Expression>> args_)
         : Expression(src), identifier(identifier_), args(std::move(args_)) {}
 };
 class VariableReference : public Expression {
@@ -216,25 +216,25 @@ public:
                          std::unique_ptr<Expression> value_)
         : Statement(src), identifier(identifier_), value(std::move(value_)) {}
 };
-class FunctionCallStmt : public Statement {
+class RoutineCallStmt : public Statement {
 public:
     std::string identifier;
     std::vector<std::unique_ptr<Expression>> args;
 
     void accept(Visitor& visitor) override;
 
-    FunctionCallStmt(SourceLocation& src, const std::string& identifier_,
-                     std::vector<std::unique_ptr<Expression>> args_)
+    RoutineCallStmt(SourceLocation& src, const std::string& identifier_,
+                    std::vector<std::unique_ptr<Expression>> args_)
         : Statement(src), identifier(identifier_), args(std::move(args_)) {}
 };
-class FunctionDefinition : public Statement {
+class RoutineDefinition : public Statement {
 public:
     std::string identifier;
     std::unique_ptr<ScopeBlock> scope;
 
     void accept(Visitor& visitor) override;
 
-    FunctionDefinition(const std::string& identifier_, std::unique_ptr<ScopeBlock> scope_ = nullptr)
+    RoutineDefinition(const std::string& identifier_, std::unique_ptr<ScopeBlock> scope_ = nullptr)
         : identifier(identifier_), scope(std::move(scope_)) {}
 };
 
@@ -292,12 +292,12 @@ public:
     virtual void visit(VoidLiteral& node) = 0;
     virtual void visit(VariableDefinition& node) = 0;
     virtual void visit(BinaryExpression& node) = 0;
-    virtual void visit(FunctionCallExpr& node) = 0;
+    virtual void visit(RoutineCallExpr& node) = 0;
     virtual void visit(VariableReference& node) = 0;
     virtual void visit(UnaryExpression& node) = 0;
     virtual void visit(VariableReassignment& node) = 0;
-    virtual void visit(FunctionCallStmt& node) = 0;
-    virtual void visit(FunctionDefinition& node) = 0;
+    virtual void visit(RoutineCallStmt& node) = 0;
+    virtual void visit(RoutineDefinition& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -316,12 +316,12 @@ public:
     void visit(VoidLiteral& node) override;
     void visit(VariableDefinition& node) override;
     void visit(BinaryExpression& node) override;
-    void visit(FunctionCallExpr& node) override;
+    void visit(RoutineCallExpr& node) override;
     void visit(VariableReference& node) override;
     void visit(UnaryExpression& node) override;
     void visit(VariableReassignment& node) override;
-    void visit(FunctionCallStmt& node) override;
-    void visit(FunctionDefinition& node) override;
+    void visit(RoutineCallStmt& node) override;
+    void visit(RoutineDefinition& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -348,7 +348,7 @@ inline void VariableDefinition::accept(Visitor& visitor) {
 inline void BinaryExpression::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
-inline void FunctionCallExpr::accept(Visitor& visitor) {
+inline void RoutineCallExpr::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void VariableReference::accept(Visitor& visitor) {
@@ -360,9 +360,9 @@ inline void UnaryExpression::accept(Visitor& visitor) {
 inline void VariableReassignment::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
-inline void FunctionCallStmt::accept(Visitor& visitor) {
+inline void RoutineCallStmt::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
-inline void FunctionDefinition::accept(Visitor& visitor) {
+inline void RoutineDefinition::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

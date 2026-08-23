@@ -35,11 +35,11 @@ private:
             std::unique_ptr<FloatLiteral> parseFloat();
             std::unique_ptr<StringLiteral> parseString();
 
-        std::unique_ptr<FunctionCallExpr> parseFunctionCallExpr();
+        std::unique_ptr<RoutineCallExpr> parseFunctionCallExpr();
         
     std::unique_ptr<Statement> parseStatement();
-    std::unique_ptr<FunctionDefinition> parseFunctionDefinition();
-    std::unique_ptr<FunctionCallStmt> parseFunctionCallStmt();
+    std::unique_ptr<RoutineDefinition> parseRoutineDefinition();
+    std::unique_ptr<RoutineCallStmt> parseRoutineCallStmt();
     std::unique_ptr<VariableDefinition> parseVariableDeclaration();
     std::unique_ptr<VariableReassignment> parseVariableReassignment();
     std::unique_ptr<ScopeBlock> parseScope(bool require_brackets = true);

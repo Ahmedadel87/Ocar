@@ -53,12 +53,12 @@ public:
     void visit(VoidLiteral& node) override;
     void visit(VariableDefinition& node) override;
     void visit(BinaryExpression& node) override;
-    void visit(FunctionCallExpr& node) override;
+    void visit(RoutineCallExpr& node) override;
     void visit(VariableReference& node) override;
     void visit(UnaryExpression& node) override;
     void visit(VariableReassignment& node) override;
-    void visit(FunctionCallStmt& node) override;
-    void visit(FunctionDefinition& node) override;
+    void visit(RoutineCallStmt& node) override;
+    void visit(RoutineDefinition& node) override;
 
     std::unique_ptr<ScopeBlock> hand_over_AST();
     void load_ast(uq<ScopeBlock> ast_);

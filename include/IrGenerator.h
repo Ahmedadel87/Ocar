@@ -56,6 +56,30 @@ public:
         stream << " -> " << memname;
     }
 };
+class IrLabelStmt : public IrStmt {
+public:
+    std::string labeltext;
+    IrLabelStmt(const std::string& labeltext_) : labeltext(labeltext_) {}
+
+    void print(std::ostream& stream) const override {
+        stream << labeltext << ":";
+    }
+};
+class IrRetStmt : public IrStmt {
+public:
+    void print(std::ostream& stream) const override {
+        stream << "ret";
+    }
+};
+class IrRtnCall : public IrStmt {
+public:
+    std::string rtnname;
+    IrRtnCall(const std::string& rtnname_) : rtnname(rtnname_) {}
+
+    void print(std::ostream& stream) const override {
+        stream << "call " << rtnname;
+    }
+};
 
 class IrGenerator : public Visitor {
 private:
@@ -97,12 +121,12 @@ public:
     void visit(VoidLiteral& node) override;
     void visit(VariableDefinition& node) override;
     void visit(BinaryExpression& node) override;
-    void visit(FunctionCallExpr& node) override;
+    void visit(RoutineCallExpr& node) override;
     void visit(VariableReference& node) override;
     void visit(UnaryExpression& node) override;
     void visit(VariableReassignment& node) override;
-    void visit(FunctionCallStmt& node) override;
-    void visit(FunctionDefinition& node) override;
+    void visit(RoutineCallStmt& node) override;
+    void visit(RoutineDefinition& node) override;
 };
 
 } // namespace casmlang

@@ -42,12 +42,15 @@ std::unique_ptr<ScopeBlock> Parser::parseScope(bool require_brackets) {
 std::unique_ptr<Statement> Parser::parseStatement() {
     if (match(TokenType::Semicolon))
         return nullptr;
-
-    if (check(TokenType::KeywordRegister)) {
+    else if (check(TokenType::KeywordRegister))
         return parseVariableDeclaration();
-    } else if (check(TokenType::Identifier)) {
+    else if (check(TokenType::Identifier)) {
+        if (peek(1).type == TokenType::LParen)
+            return parseRoutineCallStmt();
         return parseVariableReassignment();
-    } else {
+    } else if (check(TokenType::KeywordRoutine))
+        return parseRoutineDefinition();
+    else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
     }
@@ -68,7 +71,7 @@ std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
     return std::make_unique<VariableDefinition>(tkn.location, type_string, identifier,
                                                 std::move(value));
 }
-std::unique_ptr<FunctionCallExpr> Parser::parseFunctionCallExpr() {
+std::unique_ptr<RoutineCallExpr> Parser::parseFunctionCallExpr() {
     Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
     std::string identifier = tkn.lexeme;
     eat(TokenType::LParen, "expected '(' after identifier for function call");
@@ -86,7 +89,7 @@ std::unique_ptr<FunctionCallExpr> Parser::parseFunctionCallExpr() {
         eat(TokenType::Comma);
     }
 
-    return std::make_unique<FunctionCallExpr>(tkn.location, identifier, std::move(args));
+    return std::make_unique<RoutineCallExpr>(tkn.location, identifier, std::move(args));
 }
 std::unique_ptr<VariableReassignment> Parser::parseVariableReassignment() {
     Token tkn = eat(TokenType::Identifier, "expected identifier for variable reassignment");
@@ -99,11 +102,11 @@ std::unique_ptr<VariableReassignment> Parser::parseVariableReassignment() {
     eat(TokenType::Semicolon, "expected semicolon after statement");
     return std::move(ptr);
 }
-std::unique_ptr<FunctionCallStmt> Parser::parseFunctionCallStmt() {
-    Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
+std::unique_ptr<RoutineCallStmt> Parser::parseRoutineCallStmt() {
+    Token tkn = eat(TokenType::Identifier, "expected identifier for routine call");
     std::string identifier = tkn.lexeme;
 
-    eat(TokenType::LParen, "expected '(' after identifier for function call");
+    eat(TokenType::LParen, "expected '(' after identifier for routine call");
     std::vector<std::unique_ptr<Expression>> args;
 
     while (!isEnd() && !match(TokenType::RParen)) {
@@ -111,28 +114,28 @@ std::unique_ptr<FunctionCallStmt> Parser::parseFunctionCallStmt() {
         if (match(TokenType::RParen))
             break;
         if (isEnd()) {
-            parserPanic("unexpected eof token before closing parenthesis of function call");
+            parserPanic("unexpected eof token before closing parenthesis of routine call");
             break;
         }
 
-        eat(TokenType::Comma, "expected comma between function arguments");
+        eat(TokenType::Comma, "expected comma between routine arguments");
     }
 
-    eat(TokenType::Semicolon, "expected semi colon after function call");
-    return std::make_unique<FunctionCallStmt>(tkn.location, identifier, std::move(args));
+    eat(TokenType::Semicolon, "expected semi colon after routine call");
+    return std::make_unique<RoutineCallStmt>(tkn.location, identifier, std::move(args));
 }
 
-std::unique_ptr<FunctionDefinition> Parser::parseFunctionDefinition() {
-    Token tkn = eat(TokenType::KeywordRegister, "expected memory name for function definition");
+std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {
+    Token tkn = eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine definition");
 
     std::string type_string = tkn.lexeme;
 
-    std::string identifier = eat(TokenType::Identifier, "expected function identifier").lexeme;
-    eat(TokenType::LParen, "expected '(' after identifier for function definition");
-    eat(TokenType::RParen, "expected ')' after identifier for function definition");
+    std::string identifier = eat(TokenType::Identifier, "expected routine identifier").lexeme;
+    eat(TokenType::LParen, "expected '(' after identifier for routine definition");
+    eat(TokenType::RParen, "expected ')' after identifier for routine definition");
     auto scope = parseScope(true);
 
-    return std::make_unique<FunctionDefinition>(identifier, std::move(scope));
+    return std::make_unique<RoutineDefinition>(identifier, std::move(scope));
 }
 
 // == EXPRESSION PARSERS ==

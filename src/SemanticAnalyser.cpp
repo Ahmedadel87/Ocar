@@ -40,7 +40,7 @@ ExpressionInfo SemanticAnalyser::analyseExpression(Expression* expr) {
         return ExpressionInfo(false, true);
     } else if (auto var = dynamic_cast<VariableReference*>(expr)) {
         return ExpressionInfo(true, false);
-    } else if (auto func = dynamic_cast<FunctionCallExpr*>(expr)) {
+    } else if (auto func = dynamic_cast<RoutineCallExpr*>(expr)) {
         const Symbol* symbol = getSymbol(func->identifier);
         if (symbol == nullptr)
             semaPanic("undeclared function \"" + func->identifier + "\"", func->location);
@@ -147,7 +147,7 @@ void SemanticAnalyser::visit(VoidLiteral& node) {}
 void SemanticAnalyser::visit(BinaryExpression& node) {
     analyseExpression(&node);
 }
-void SemanticAnalyser::visit(FunctionCallExpr& node) {
+void SemanticAnalyser::visit(RoutineCallExpr& node) {
     if (!symbolExists(node.identifier)) {
         semaPanic("cannot reference function \"" + node.identifier + "\"; it does not exist.",
                   node.location);
@@ -204,7 +204,7 @@ void SemanticAnalyser::visit(VariableDefinition& node) {
 void SemanticAnalyser::visit(UnaryExpression& node) {
     node.value->accept(*this);
 }
-void SemanticAnalyser::visit(FunctionCallStmt& node) {
+void SemanticAnalyser::visit(RoutineCallStmt& node) {
     if (!symbolExists(node.identifier)) {
         semaPanic("cannot reference function \"" + node.identifier + "\"; it does not exist.",
                   node.location);
@@ -222,7 +222,7 @@ void SemanticAnalyser::visit(FunctionCallStmt& node) {
         semaPanic("more arguments than requested");
     }
 }
-void SemanticAnalyser::visit(FunctionDefinition& node) {
+void SemanticAnalyser::visit(RoutineDefinition& node) {
     addSymbol(Symbol(node.identifier, SymbolKind::Function));
     node.scope->accept(*this);
 }

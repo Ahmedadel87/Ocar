@@ -39,7 +39,7 @@ void casmlang::IrGenerator::visit(VariableDefinition& node) {
     ir.push_back(std::make_unique<IrMovStmt>(node.memory, std::move(expression)));
 };
 void casmlang::IrGenerator::visit(BinaryExpression& node) {};
-void casmlang::IrGenerator::visit(FunctionCallExpr& node) {};
+void casmlang::IrGenerator::visit(RoutineCallExpr& node) {};
 void casmlang::IrGenerator::visit(VariableReference& node) {};
 void casmlang::IrGenerator::visit(UnaryExpression& node) {};
 void casmlang::IrGenerator::visit(VariableReassignment& node) {
@@ -47,5 +47,11 @@ void casmlang::IrGenerator::visit(VariableReassignment& node) {
     std::unique_ptr<casmlang::IrExpr> expression = get_current_as<casmlang::IrExpr>();
     ir.push_back(std::make_unique<IrMovStmt>(node.memory, std::move(expression)));
 };
-void casmlang::IrGenerator::visit(FunctionCallStmt& node) {};
-void casmlang::IrGenerator::visit(FunctionDefinition& node) {};
+void casmlang::IrGenerator::visit(RoutineCallStmt& node) {
+    ir.push_back(std::make_unique<IrRtnCall>(node.identifier));
+};
+void casmlang::IrGenerator::visit(RoutineDefinition& node) {
+    ir.push_back(std::make_unique<IrLabelStmt>(node.identifier));
+    node.scope->accept(*this);
+    ir.push_back(std::make_unique<IrRetStmt>());
+};
