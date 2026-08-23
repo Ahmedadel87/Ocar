@@ -30,3 +30,19 @@ rtn _start() noret {
 @syscall
 ```
 The `@` prefix means that those instructions will translate literally to assembly. Because the language does not currently provide `mov` or `syscall` instructions, they have to be manually placed by the user.
+
+## To-do list
+- [ ] Add register freeing (e.g. `free rax`, `free rdi`)
+- [ ] Add multiline comments
+- [ ] Add `syscall` operation
+- [ ] Raw register access (e.g. `raw rax = 5`)
+- [ ] Variable support for assignment (allow `rax a = b;`)
+- [ ] Four operations
+- [ ] Branching
+- [ ] Goto and labels
+- [ ] Add linking. Probably C-style, because it's easier.
+  - [ ] Make a standard library
+- [ ] `#noheader` option that removes the autogeneration header
+- [ ] Stack memory acces (e.g. `stk[bytecount] varname = 0;`, `stk[8] myint = 17;`)
+- [ ] Function parameters/arguments
+  - Maybe give an optional `autopush` keyword that finds free spots in the stack and pushes the registers used by parameters into them, then loads them on exit, so users don't have to worry about register data disappearing.
