@@ -50,6 +50,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseVariableReassignment();
     } else if (check(TokenType::KeywordRoutine))
         return parseRoutineDefinition();
+    else if (check(TokenType::KeywordSection))
+        return parseSectionDefinition();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -123,6 +125,18 @@ std::unique_ptr<RoutineCallStmt> Parser::parseRoutineCallStmt() {
 
     eat(TokenType::Semicolon, "expected semi colon after routine call");
     return std::make_unique<RoutineCallStmt>(tkn.location, identifier, std::move(args));
+}
+std::unique_ptr<SectionDefinition> Parser::parseSectionDefinition() {
+    Token tkn = eat(TokenType::KeywordSection, "expected keyword 'sect' for section definition");
+
+    std::string type_string = tkn.lexeme;
+
+    std::string identifier = eat(TokenType::Identifier, "expected section identifier").lexeme;
+    eat(TokenType::LParen, "expected '(' after identifier for section definition");
+    eat(TokenType::RParen, "expected ')' after identifier for section definition");
+    auto scope = parseScope(true);
+
+    return std::make_unique<SectionDefinition>(identifier, std::move(scope));
 }
 
 std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {

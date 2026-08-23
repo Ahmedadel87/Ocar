@@ -39,6 +39,7 @@ private:
         
     std::unique_ptr<Statement> parseStatement();
     std::unique_ptr<RoutineDefinition> parseRoutineDefinition();
+    std::unique_ptr<SectionDefinition> parseSectionDefinition();
     std::unique_ptr<RoutineCallStmt> parseRoutineCallStmt();
     std::unique_ptr<VariableDefinition> parseVariableDeclaration();
     std::unique_ptr<VariableReassignment> parseVariableReassignment();

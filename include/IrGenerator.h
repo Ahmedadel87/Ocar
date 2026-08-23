@@ -127,6 +127,7 @@ public:
     void visit(VariableReassignment& node) override;
     void visit(RoutineCallStmt& node) override;
     void visit(RoutineDefinition& node) override;
+    void visit(SectionDefinition& node) override;
 };
 
 } // namespace casmlang

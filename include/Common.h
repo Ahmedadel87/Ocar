@@ -237,6 +237,16 @@ public:
     RoutineDefinition(const std::string& identifier_, std::unique_ptr<ScopeBlock> scope_ = nullptr)
         : identifier(identifier_), scope(std::move(scope_)) {}
 };
+class SectionDefinition : public Statement {
+public:
+    std::string identifier;
+    std::unique_ptr<ScopeBlock> scope;
+
+    void accept(Visitor& visitor) override;
+
+    SectionDefinition(const std::string& identifier_, std::unique_ptr<ScopeBlock> scope_ = nullptr)
+        : identifier(identifier_), scope(std::move(scope_)) {}
+};
 
 class Literal : public Expression {
 public:
@@ -298,6 +308,7 @@ public:
     virtual void visit(VariableReassignment& node) = 0;
     virtual void visit(RoutineCallStmt& node) = 0;
     virtual void visit(RoutineDefinition& node) = 0;
+    virtual void visit(SectionDefinition& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -322,6 +333,7 @@ public:
     void visit(VariableReassignment& node) override;
     void visit(RoutineCallStmt& node) override;
     void visit(RoutineDefinition& node) override;
+    void visit(SectionDefinition& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -364,5 +376,8 @@ inline void RoutineCallStmt::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void RoutineDefinition::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void SectionDefinition::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

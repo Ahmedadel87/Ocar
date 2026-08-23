@@ -226,3 +226,7 @@ void SemanticAnalyser::visit(RoutineDefinition& node) {
     addSymbol(Symbol(node.identifier, SymbolKind::Function));
     node.scope->accept(*this);
 }
+void SemanticAnalyser::visit(SectionDefinition& node) {
+    addSymbol(Symbol(node.identifier, SymbolKind::Function));
+    node.scope->accept(*this);
+}

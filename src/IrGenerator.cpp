@@ -55,3 +55,7 @@ void casmlang::IrGenerator::visit(RoutineDefinition& node) {
     node.scope->accept(*this);
     ir.push_back(std::make_unique<IrRetStmt>());
 };
+void casmlang::IrGenerator::visit(SectionDefinition& node) {
+    ir.push_back(std::make_unique<IrLabelStmt>("." + node.identifier));
+    node.scope->accept(*this);
+}

@@ -59,6 +59,7 @@ public:
     void visit(VariableReassignment& node) override;
     void visit(RoutineCallStmt& node) override;
     void visit(RoutineDefinition& node) override;
+    void visit(SectionDefinition& node) override;
 
     std::unique_ptr<ScopeBlock> hand_over_AST();
     void load_ast(uq<ScopeBlock> ast_);
