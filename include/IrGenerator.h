@@ -89,6 +89,15 @@ public:
         stream << "global " << identifier;
     }
 };
+class IrSection : public IrStmt {
+public:
+    std::string text;
+    IrSection(const std::string& text_) : text(text_) {}
+
+    void print(std::ostream& stream) const override {
+        stream << "section ." << text;
+    }
+};
 
 class IrGenerator : public Visitor {
 private:

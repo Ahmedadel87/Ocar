@@ -13,5 +13,7 @@ void Compiler::compile(const std::string& code, std::ostream& stream) {
 
     irgen.load_ast(sema.hand_over_AST());
     irgen.generate_ir();
-    irgen.print_ir(std::cout);
+
+    printer.load_ir(irgen.give_ir());
+    printer.print(stream);
 }

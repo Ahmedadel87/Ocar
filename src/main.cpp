@@ -34,9 +34,4 @@ int main(int argc, char* argv[]) {
     compiler.compile(sstr.str(), output);
 
     output.close();
-
-    std::string cmd = "bash " + write_to;
-    std::cout << "==OUTPUT==\n";
-    int result = system(cmd.data());
-    return result;
 }
