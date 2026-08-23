@@ -178,12 +178,12 @@ std::unique_ptr<RoutineDeclaration> Parser::parseRoutineDeclaration() {
 
     return std::make_unique<RoutineDeclaration>(identifier);
 }
-std::unique_ptr<DeleteVariable> Parser::parseDeleteVar() {
+std::unique_ptr<DeleteSymbol> Parser::parseDeleteVar() {
     auto tkn = eat(TokenType::KeywordDelete, "expected keyword 'delete' for delete statement");
     auto identifier = eat(TokenType::Identifier, "expected identifier after 'delete'").lexeme;
     eat(TokenType::Semicolon, "expected semicolon afted delete statement");
 
-    return std::make_unique<DeleteVariable>(identifier);
+    return std::make_unique<DeleteSymbol>(identifier);
 }
 
 // == EXPRESSION PARSERS ==

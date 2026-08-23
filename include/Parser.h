@@ -38,7 +38,7 @@ private:
         std::unique_ptr<RoutineCallExpr> parseFunctionCallExpr();
         
     std::unique_ptr<Statement> parseStatement();
-    std::unique_ptr<DeleteVariable> parseDeleteVar();
+    std::unique_ptr<DeleteSymbol> parseDeleteVar();
     std::unique_ptr<Global> parseGlobal();
     std::unique_ptr<RoutineDefinition> parseRoutineDefinition();
     std::unique_ptr<RoutineDeclaration> parseRoutineDeclaration();

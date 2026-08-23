@@ -282,12 +282,12 @@ public:
 
     AsmInstruction(const std::string& instruction_) : instruction(instruction_) {}
 };
-class DeleteVariable : public Statement {
+class DeleteSymbol : public Statement {
 public:
     std::string identifier;
     void accept(Visitor& visitor) override;
 
-    DeleteVariable(const std::string& identifier_) : identifier(identifier_) {}
+    DeleteSymbol(const std::string& identifier_) : identifier(identifier_) {}
 };
 
 class Literal : public Expression {
@@ -354,7 +354,7 @@ public:
     virtual void visit(Global& node) = 0;
     virtual void visit(RoutineDeclaration& node) = 0;
     virtual void visit(AsmInstruction& node) = 0;
-    virtual void visit(DeleteVariable& node) = 0;
+    virtual void visit(DeleteSymbol& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -383,7 +383,7 @@ public:
     void visit(Global& node) override;
     void visit(RoutineDeclaration& node) override;
     void visit(AsmInstruction& node) override;
-    void visit(DeleteVariable& node) override;
+    void visit(DeleteSymbol& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -440,6 +440,6 @@ inline void RoutineDeclaration::accept(Visitor& visitor) {
 inline void AsmInstruction::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
-inline void DeleteVariable::accept(Visitor& visitor) {
+inline void DeleteSymbol::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

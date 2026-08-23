@@ -255,7 +255,7 @@ void SemanticAnalyser::visit(RoutineDeclaration& node) {
     addSymbol(Symbol(node.identifier, SymbolKind::Routine));
 }
 void SemanticAnalyser::visit(AsmInstruction& node) {}
-void SemanticAnalyser::visit(DeleteVariable& node) {
+void SemanticAnalyser::visit(DeleteSymbol& node) {
     if (!symbolExists(node.identifier))
         semaPanic("cannot delete \"" + node.identifier + "\"; it is not declared");
 
