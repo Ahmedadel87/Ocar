@@ -147,6 +147,7 @@ public:
     void visit(RoutineDefinition& node) override;
     void visit(SectionDefinition& node) override;
     void visit(Global& node) override;
+    void visit(RoutineDeclaration& node) override;
 };
 
 } // namespace casmlang

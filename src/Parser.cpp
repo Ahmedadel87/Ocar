@@ -45,9 +45,11 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         if (peek(1).type == TokenType::LParen)
             return parseRoutineCallStmt();
         return parseVariableReassignment();
-    } else if (check(TokenType::KeywordRoutine))
+    } else if (check(TokenType::KeywordRoutine)) {
+        if (peek(4).type == TokenType::Semicolon)
+            return parseRoutineDeclaration();
         return parseRoutineDefinition();
-    else if (check(TokenType::KeywordSection))
+    } else if (check(TokenType::KeywordSection))
         return parseSectionDefinition();
     else if (check(TokenType::KeywordGlobal))
         return parseGlobal();
@@ -156,6 +158,18 @@ std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {
     auto scope = parseScope(true);
 
     return std::make_unique<RoutineDefinition>(identifier, std::move(scope));
+}
+std::unique_ptr<RoutineDeclaration> Parser::parseRoutineDeclaration() {
+    Token tkn = eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine declaration");
+
+    std::string type_string = tkn.lexeme;
+
+    std::string identifier = eat(TokenType::Identifier, "expected routine identifier").lexeme;
+    eat(TokenType::LParen, "expected '(' after identifier for routine declaration");
+    eat(TokenType::RParen, "expected ')' after identifier for routine declaration");
+    eat(TokenType::Semicolon, "expected semicolon after forward routine declaration");
+
+    return std::make_unique<RoutineDeclaration>(identifier);
 }
 
 // == EXPRESSION PARSERS ==

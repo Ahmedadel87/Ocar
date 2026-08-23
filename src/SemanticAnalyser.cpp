@@ -239,3 +239,6 @@ void SemanticAnalyser::visit(Global& node) {
         semaPanic("cannot use 'global' on symbol \"" + node.identifier + "\"; it is not a routine");
     }
 }
+void SemanticAnalyser::visit(RoutineDeclaration& node) {
+    addSymbol(Symbol(node.identifier, SymbolKind::Routine));
+}

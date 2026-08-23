@@ -122,3 +122,6 @@ void PrettyPrinter::visit(SectionDefinition& node) {
 void PrettyPrinter::visit(Global& node) {
     stream << "global " << node.identifier;
 }
+void PrettyPrinter::visit(RoutineDeclaration& node) {
+    stream << "FunctionDeclaration " << node.identifier;
+}

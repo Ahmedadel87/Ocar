@@ -257,6 +257,14 @@ public:
 
     Global(const std::string& identifier_) : identifier(identifier_) {}
 };
+class RoutineDeclaration : public Statement {
+public:
+    std::string identifier;
+
+    RoutineDeclaration(const std::string& identifier_) : identifier(identifier_) {}
+
+    void accept(Visitor& visitor) override;
+};
 
 class Literal : public Expression {
 public:
@@ -320,6 +328,7 @@ public:
     virtual void visit(RoutineDefinition& node) = 0;
     virtual void visit(SectionDefinition& node) = 0;
     virtual void visit(Global& node) = 0;
+    virtual void visit(RoutineDeclaration& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -346,6 +355,7 @@ public:
     void visit(RoutineDefinition& node) override;
     void visit(SectionDefinition& node) override;
     void visit(Global& node) override;
+    void visit(RoutineDeclaration& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -394,5 +404,8 @@ inline void SectionDefinition::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void Global::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void RoutineDeclaration::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
