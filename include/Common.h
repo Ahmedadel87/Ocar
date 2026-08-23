@@ -28,6 +28,7 @@ enum class TokenType {
     KeywordRegister,
     KeywordRoutine,
     KeywordSection,
+    KeywordGlobal,
 
     EndOfFile
 };
@@ -72,6 +73,7 @@ const std::unordered_map<std::string, TokenType> word_table{
     {{"", TokenType::None},
      {"rtn", TokenType::KeywordRoutine},
      {"sect", TokenType::KeywordSection},
+     {"global", TokenType::KeywordGlobal},
 
      {"rax", TokenType::KeywordRegister},
      {"rbx", TokenType::KeywordRegister},
@@ -247,6 +249,14 @@ public:
     SectionDefinition(const std::string& identifier_, std::unique_ptr<ScopeBlock> scope_ = nullptr)
         : identifier(identifier_), scope(std::move(scope_)) {}
 };
+class Global : public Statement {
+public:
+    std::string identifier;
+
+    void accept(Visitor& visitor) override;
+
+    Global(const std::string& identifier_) : identifier(identifier_) {}
+};
 
 class Literal : public Expression {
 public:
@@ -309,6 +319,7 @@ public:
     virtual void visit(RoutineCallStmt& node) = 0;
     virtual void visit(RoutineDefinition& node) = 0;
     virtual void visit(SectionDefinition& node) = 0;
+    virtual void visit(Global& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -334,6 +345,7 @@ public:
     void visit(RoutineCallStmt& node) override;
     void visit(RoutineDefinition& node) override;
     void visit(SectionDefinition& node) override;
+    void visit(Global& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -379,5 +391,8 @@ inline void RoutineDefinition::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void SectionDefinition::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void Global::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

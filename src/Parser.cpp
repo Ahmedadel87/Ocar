@@ -52,6 +52,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseRoutineDefinition();
     else if (check(TokenType::KeywordSection))
         return parseSectionDefinition();
+    else if (check(TokenType::KeywordGlobal))
+        return parseGlobal();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -138,7 +140,14 @@ std::unique_ptr<SectionDefinition> Parser::parseSectionDefinition() {
 
     return std::make_unique<SectionDefinition>(identifier, std::move(scope));
 }
-
+std::unique_ptr<Global> Parser::parseGlobal() {
+    auto tkn = eat(TokenType::KeywordGlobal, "expected keyword 'global' for global definition");
+    std::string identifier = eat(TokenType::Identifier, "expected identifier for global").lexeme;
+    eat(TokenType::LParen, "expected function identifier for global");
+    eat(TokenType::RParen, "expected function identifier for global");
+    eat(TokenType::Semicolon, "expected semicolon after global statement");
+    return std::make_unique<Global>(identifier);
+}
 std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {
     Token tkn = eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine definition");
 

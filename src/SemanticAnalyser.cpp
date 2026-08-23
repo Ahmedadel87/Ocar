@@ -152,7 +152,7 @@ void SemanticAnalyser::visit(RoutineCallExpr& node) {
         semaPanic("cannot reference function \"" + node.identifier + "\"; it does not exist.",
                   node.location);
     }
-    if (getSymbol(node.identifier)->kind != SymbolKind::Function) {
+    if (getSymbol(node.identifier)->kind != SymbolKind::Routine) {
         semaPanic("\"" + node.identifier + "\" is used as a function even though it is a variable",
                   node.location);
     }
@@ -209,7 +209,7 @@ void SemanticAnalyser::visit(RoutineCallStmt& node) {
         semaPanic("cannot reference function \"" + node.identifier + "\"; it does not exist.",
                   node.location);
     }
-    if (getSymbol(node.identifier)->kind != SymbolKind::Function) {
+    if (getSymbol(node.identifier)->kind != SymbolKind::Routine) {
         semaPanic("\"" + node.identifier + "\" is used as a function even though it is a variable",
                   node.location);
     }
@@ -223,10 +223,19 @@ void SemanticAnalyser::visit(RoutineCallStmt& node) {
     }
 }
 void SemanticAnalyser::visit(RoutineDefinition& node) {
-    addSymbol(Symbol(node.identifier, SymbolKind::Function));
+    addSymbol(Symbol(node.identifier, SymbolKind::Routine));
     node.scope->accept(*this);
 }
 void SemanticAnalyser::visit(SectionDefinition& node) {
-    addSymbol(Symbol(node.identifier, SymbolKind::Function));
+    addSymbol(Symbol(node.identifier, SymbolKind::Routine));
     node.scope->accept(*this);
+}
+void SemanticAnalyser::visit(Global& node) {
+    if (!symbolExists(node.identifier))
+        semaPanic("cannot make identifier \"" + node.identifier + "\" global; it is not declared",
+                  node.location);
+
+    if (getSymbol(node.identifier)->kind != SymbolKind::Routine) {
+        semaPanic("cannot use 'global' on symbol \"" + node.identifier + "\"; it is not a routine");
+    }
 }
