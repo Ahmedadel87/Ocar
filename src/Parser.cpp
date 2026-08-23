@@ -57,7 +57,9 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         auto instr = peek().lexeme;
         advance();
         return std::make_unique<AsmInstruction>(instr);
-    } else {
+    } else if (check(TokenType::KeywordDelete))
+        return parseDeleteVar();
+    else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
     }
@@ -175,6 +177,13 @@ std::unique_ptr<RoutineDeclaration> Parser::parseRoutineDeclaration() {
     eat(TokenType::Semicolon, "expected semicolon after forward routine declaration");
 
     return std::make_unique<RoutineDeclaration>(identifier);
+}
+std::unique_ptr<DeleteVariable> Parser::parseDeleteVar() {
+    auto tkn = eat(TokenType::KeywordDelete, "expected keyword 'delete' for delete statement");
+    auto identifier = eat(TokenType::Identifier, "expected identifier after 'delete'").lexeme;
+    eat(TokenType::Semicolon, "expected semicolon afted delete statement");
+
+    return std::make_unique<DeleteVariable>(identifier);
 }
 
 // == EXPRESSION PARSERS ==

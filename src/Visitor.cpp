@@ -128,3 +128,6 @@ void PrettyPrinter::visit(RoutineDeclaration& node) {
 void PrettyPrinter::visit(AsmInstruction& node) {
     stream << "raw instruction: " << node.instruction;
 }
+void PrettyPrinter::visit(DeleteVariable& node) {
+    stream << "delete " << node.identifier;
+}

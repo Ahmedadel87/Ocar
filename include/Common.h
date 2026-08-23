@@ -33,6 +33,7 @@ enum class TokenType {
     KeywordSection,
     KeywordGlobal,
     KeywordNoreturn,
+    KeywordDelete,
 
     EndOfFile
 };
@@ -79,6 +80,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"sect", TokenType::KeywordSection},
      {"global", TokenType::KeywordGlobal},
      {"noret", TokenType::KeywordNoreturn},
+     {"delete", TokenType::KeywordDelete},
 
      {"rax", TokenType::KeywordRegister},
      {"rbx", TokenType::KeywordRegister},
@@ -280,6 +282,13 @@ public:
 
     AsmInstruction(const std::string& instruction_) : instruction(instruction_) {}
 };
+class DeleteVariable : public Statement {
+public:
+    std::string identifier;
+    void accept(Visitor& visitor) override;
+
+    DeleteVariable(const std::string& identifier_) : identifier(identifier_) {}
+};
 
 class Literal : public Expression {
 public:
@@ -345,6 +354,7 @@ public:
     virtual void visit(Global& node) = 0;
     virtual void visit(RoutineDeclaration& node) = 0;
     virtual void visit(AsmInstruction& node) = 0;
+    virtual void visit(DeleteVariable& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -373,6 +383,7 @@ public:
     void visit(Global& node) override;
     void visit(RoutineDeclaration& node) override;
     void visit(AsmInstruction& node) override;
+    void visit(DeleteVariable& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -427,5 +438,8 @@ inline void RoutineDeclaration::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void AsmInstruction::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void DeleteVariable::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

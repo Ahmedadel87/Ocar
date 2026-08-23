@@ -159,6 +159,7 @@ public:
     void visit(Global& node) override;
     void visit(RoutineDeclaration& node) override;
     void visit(AsmInstruction& node) override;
+    void visit(DeleteVariable& node) override;
 };
 
 } // namespace casmlang

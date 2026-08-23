@@ -243,3 +243,20 @@ void SemanticAnalyser::visit(RoutineDeclaration& node) {
     addSymbol(Symbol(node.identifier, SymbolKind::Routine));
 }
 void SemanticAnalyser::visit(AsmInstruction& node) {}
+void SemanticAnalyser::visit(DeleteVariable& node) {
+    if (!symbolExists(node.identifier))
+        semaPanic("cannot delete \"" + node.identifier + "\"; it is not declared");
+
+    if (getSymbol(node.identifier)->kind != SymbolKind::Variable)
+        semaPanic("cannot delete \"" + node.identifier + "\"; it is not a variable");
+
+    stack.back()->symbols.erase(node.identifier);
+    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
+                           [&](const auto& p) { return p.second == node.identifier; });
+
+    if (it != activeMemory.end())
+        activeMemory.erase(it);
+    else
+        semaPanic("Internal, cannot erase memory \"" + it->first + "\" occupied by \"" +
+                  it->second + "\"");
+}

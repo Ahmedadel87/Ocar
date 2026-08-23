@@ -67,3 +67,4 @@ void casmlang::IrGenerator::visit(RoutineDeclaration& node) {}
 void casmlang::IrGenerator::visit(AsmInstruction& node) {
     ir.push_back(std::make_unique<IrAsm>(node.instruction));
 }
+void casmlang::IrGenerator::visit(DeleteVariable& node) {}
