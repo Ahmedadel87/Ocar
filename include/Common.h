@@ -29,6 +29,7 @@ enum class TokenType {
     KeywordRoutine,
     KeywordSection,
     KeywordGlobal,
+    KeywordNoreturn,
 
     EndOfFile
 };
@@ -74,6 +75,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"rtn", TokenType::KeywordRoutine},
      {"sect", TokenType::KeywordSection},
      {"global", TokenType::KeywordGlobal},
+     {"noret", TokenType::KeywordNoreturn},
 
      {"rax", TokenType::KeywordRegister},
      {"rbx", TokenType::KeywordRegister},
@@ -233,11 +235,13 @@ class RoutineDefinition : public Statement {
 public:
     std::string identifier;
     std::unique_ptr<ScopeBlock> scope;
+    bool hasRet = true;
 
     void accept(Visitor& visitor) override;
 
-    RoutineDefinition(const std::string& identifier_, std::unique_ptr<ScopeBlock> scope_ = nullptr)
-        : identifier(identifier_), scope(std::move(scope_)) {}
+    RoutineDefinition(const std::string& identifier_, std::unique_ptr<ScopeBlock> scope_ = nullptr,
+                      bool hasRet_ = true)
+        : identifier(identifier_), scope(std::move(scope_)), hasRet(hasRet_) {}
 };
 class SectionDefinition : public Statement {
 public:

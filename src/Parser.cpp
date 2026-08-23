@@ -155,9 +155,10 @@ std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {
     std::string identifier = eat(TokenType::Identifier, "expected routine identifier").lexeme;
     eat(TokenType::LParen, "expected '(' after identifier for routine definition");
     eat(TokenType::RParen, "expected ')' after identifier for routine definition");
+    bool hasReturn = !match(TokenType::KeywordNoreturn);
     auto scope = parseScope(true);
 
-    return std::make_unique<RoutineDefinition>(identifier, std::move(scope));
+    return std::make_unique<RoutineDefinition>(identifier, std::move(scope), hasReturn);
 }
 std::unique_ptr<RoutineDeclaration> Parser::parseRoutineDeclaration() {
     Token tkn = eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine declaration");
