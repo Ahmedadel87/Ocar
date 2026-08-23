@@ -10,4 +10,8 @@ void Compiler::compile(const std::string& code, std::ostream& stream) {
 
     sema.load_ast(parser.hand_over_AST());
     sema.analyse();
+
+    irgen.load_ast(sema.hand_over_AST());
+    irgen.generate_ir();
+    irgen.print_ir(std::cout);
 }

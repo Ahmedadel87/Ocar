@@ -1,1 +1,51 @@
 #include "../include/IrGenerator.h"
+
+// == HELPERS ==
+void casmlang::IrGenerator::load_ast(std::unique_ptr<ScopeBlock> ast) {
+    entry_point = std::move(ast);
+}
+std::vector<std::unique_ptr<casmlang::Ir>> casmlang::IrGenerator::give_ir() {
+    return std::move(ir);
+}
+
+void casmlang::IrGenerator::generate_ir() {
+    entry_point->accept(*this);
+}
+void casmlang::IrGenerator::print_ir(std::ostream& stream) {
+    for (auto& irnode : ir) {
+        irnode->print(stream);
+        stream << "\n";
+    }
+}
+
+// == VISIT ==
+void casmlang::IrGenerator::visit(ScopeBlock& node) {
+    for (auto& child : node.children) {
+        child->accept(*this);
+    }
+};
+void casmlang::IrGenerator::visit(StringLiteral& node) {
+
+};
+void casmlang::IrGenerator::visit(FloatLiteral& node) {};
+void casmlang::IrGenerator::visit(IntegerLiteral& node) {
+    currentNode = std::make_unique<IrIntLit>(node.number);
+};
+void casmlang::IrGenerator::visit(BooleanLiteral& node) {};
+void casmlang::IrGenerator::visit(VoidLiteral& node) {};
+void casmlang::IrGenerator::visit(VariableDefinition& node) {
+    node.value->accept(*this);
+    std::unique_ptr<casmlang::IrExpr> expression = get_current_as<casmlang::IrExpr>();
+    ir.push_back(std::make_unique<IrMovStmt>(node.memory, std::move(expression)));
+};
+void casmlang::IrGenerator::visit(BinaryExpression& node) {};
+void casmlang::IrGenerator::visit(FunctionCallExpr& node) {};
+void casmlang::IrGenerator::visit(VariableReference& node) {};
+void casmlang::IrGenerator::visit(UnaryExpression& node) {};
+void casmlang::IrGenerator::visit(VariableReassignment& node) {
+    node.value->accept(*this);
+    std::unique_ptr<casmlang::IrExpr> expression = get_current_as<casmlang::IrExpr>();
+    ir.push_back(std::make_unique<IrMovStmt>(node.memory, std::move(expression)));
+};
+void casmlang::IrGenerator::visit(FunctionCallStmt& node) {};
+void casmlang::IrGenerator::visit(FunctionDefinition& node) {};

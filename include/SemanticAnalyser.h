@@ -36,6 +36,7 @@ class SemanticAnalyser : public Visitor {
 
     void push_active_memory(const std::string& memname, const std::string& varname);
     void remove_active_memory(const std::string& varname);
+    std::string& find_memory_by_varname(const std::string& varname);
     std::string& find_in_active_memory(const std::string& memname);
 
     bool symbolExists(const std::string& identifier) const;

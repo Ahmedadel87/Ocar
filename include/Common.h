@@ -207,6 +207,7 @@ public:
 class VariableReassignment : public Statement {
 public:
     std::string identifier;
+    std::string memory = "";
     std::unique_ptr<Expression> value;
 
     void accept(Visitor& visitor) override;

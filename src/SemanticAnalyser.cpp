@@ -119,6 +119,15 @@ std::string& SemanticAnalyser::find_in_active_memory(const std::string& memname)
     else
         return emptystring;
 }
+std::string& SemanticAnalyser::find_memory_by_varname(const std::string& varname) {
+    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
+                           [&](const auto& p) { return p.second == varname; });
+
+    if (it != activeMemory.end())
+        return it->first;
+    else
+        return emptystring;
+}
 
 // == VISIT ==
 void SemanticAnalyser::visit(ScopeBlock& node) {
@@ -176,6 +185,12 @@ void SemanticAnalyser::visit(VariableReassignment& node) {
         semaPanic("\"" + node.identifier + "\" is used as a variable even though it is a function",
                   node.location);
     }
+    std::string memname = find_memory_by_varname(node.identifier);
+    if (memname.empty()) {
+        semaPanic("Could not resolve memory name for identifier \"" + node.identifier + "\"",
+                  node.location);
+    }
+    node.memory = memname;
 }
 void SemanticAnalyser::visit(VariableDefinition& node) {
     std::string& othervar = find_in_active_memory(node.memory);

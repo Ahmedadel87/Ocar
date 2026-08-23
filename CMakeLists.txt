@@ -10,6 +10,7 @@ add_executable(CasmLang
         src/Parser.cpp
         src/Visitor.cpp
         src/SemanticAnalyser.cpp
+        src/IrGenerator.cpp
 )
 target_include_directories(CasmLang
     PRIVATE
