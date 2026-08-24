@@ -6,14 +6,14 @@
 
 class Parser {
 private:
-    std::vector<Token> tokens;
+    std::vector<casmlang::Token> tokens;
     std::unique_ptr<ScopeBlock> entry_point = std::make_unique<ScopeBlock>();
 
     int cursor = 0;
 
-    Token& peek(int offset = 0);
-    Token& previous(int offset = 0);
-    Token eat(TokenType type, const std::string& msg = "");
+    casmlang::Token& peek(int offset = 0);
+    casmlang::Token& previous(int offset = 0);
+    casmlang::Token eat(TokenType type, const std::string& msg = "");
     bool isEnd();
     bool match(TokenType type);
     bool check(TokenType type);
@@ -54,7 +54,7 @@ private:
 
     // clang-format on
 public:
-    void load_tokens(std::vector<Token> tokens_);
+    void load_tokens(std::vector<casmlang::Token> tokens_);
     void parse();
     std::unique_ptr<ScopeBlock> hand_over_AST();
 };

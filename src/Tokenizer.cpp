@@ -11,6 +11,7 @@
     advance();                                                                                     \
     continue
 
+namespace casmlang {
 void Tokenizer::advance(int amount) {
     for (int i = 0; i < amount; i++) {
         if (peek(i) == '\n') {
@@ -40,7 +41,7 @@ void Tokenizer::assert_validity(const int pos, const std::string& msg) const {
     }
 }
 void Tokenizer::token(const TokenType tkn, const std::string& lexeme_, SourceLocation lct) {
-    tokens.push_back(Token(tkn, lexeme_, lct));
+    tokens.push_back(casmlang::Token(tkn, lexeme_, lct));
 }
 bool Tokenizer::eof() {
     return cursor >= code.size();
@@ -59,7 +60,7 @@ TokenType Tokenizer::get_word_type(const std::string& str, bool allow_identifier
     }
     return TokenType::None;
 }
-std::vector<Token>& Tokenizer::get_tokens() {
+std::vector<casmlang::Token>& Tokenizer::get_tokens() {
     return tokens;
 }
 
@@ -211,4 +212,5 @@ void Tokenizer::tokenize(const std::string& c) {
     }
 
     token(TokenType::EndOfFile, "\0", SourceLocation(row, column));
+}
 }

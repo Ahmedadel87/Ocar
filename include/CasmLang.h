@@ -11,7 +11,7 @@
 
 class Compiler {
 private:
-    Tokenizer tokenizer;
+    casmlang::Tokenizer tokenizer;
     Parser parser;
     SemanticAnalyser sema;
     casmlang::IrGenerator irgen;

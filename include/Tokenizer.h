@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+namespace casmlang {
+
 class Token {
 public:
     TokenType type;
@@ -39,3 +41,4 @@ public:
     std::vector<Token>& get_tokens();
     void pretty_print(std::ostream& os);
 };
+}

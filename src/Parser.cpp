@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 
-void Parser::load_tokens(std::vector<Token> tkns) {
+void Parser::load_tokens(std::vector<casmlang::Token> tkns) {
     tokens = std::move(tkns);
 }
 std::unique_ptr<ScopeBlock> Parser::hand_over_AST() {
@@ -72,7 +72,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
     }
 }
 std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
-    Token tkn = eat(TokenType::KeywordRegister, "expected memory name for variable declaration");
+    casmlang::Token tkn =
+        eat(TokenType::KeywordRegister, "expected memory name for variable declaration");
 
     std::string type_string = tkn.lexeme;
 
@@ -88,7 +89,7 @@ std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
                                                 std::move(value));
 }
 std::unique_ptr<RoutineCallExpr> Parser::parseFunctionCallExpr() {
-    Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
+    casmlang::Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
     std::string identifier = tkn.lexeme;
     eat(TokenType::LParen, "expected '(' after identifier for function call");
     std::vector<std::unique_ptr<Expression>> args;
@@ -108,7 +109,8 @@ std::unique_ptr<RoutineCallExpr> Parser::parseFunctionCallExpr() {
     return std::make_unique<RoutineCallExpr>(tkn.location, identifier, std::move(args));
 }
 std::unique_ptr<VariableReassignment> Parser::parseVariableReassignment() {
-    Token tkn = eat(TokenType::Identifier, "expected identifier for variable reassignment");
+    casmlang::Token tkn =
+        eat(TokenType::Identifier, "expected identifier for variable reassignment");
     std::string identifier = tkn.lexeme;
 
     eat(TokenType::EqualSign, "expected equal sign after identifier in variable reassignment");
@@ -119,7 +121,7 @@ std::unique_ptr<VariableReassignment> Parser::parseVariableReassignment() {
     return std::move(ptr);
 }
 std::unique_ptr<RoutineCallStmt> Parser::parseRoutineCallStmt() {
-    Token tkn = eat(TokenType::Identifier, "expected identifier for routine call");
+    casmlang::Token tkn = eat(TokenType::Identifier, "expected identifier for routine call");
     std::string identifier = tkn.lexeme;
 
     eat(TokenType::LParen, "expected '(' after identifier for routine call");
@@ -141,7 +143,8 @@ std::unique_ptr<RoutineCallStmt> Parser::parseRoutineCallStmt() {
     return std::make_unique<RoutineCallStmt>(tkn.location, identifier, std::move(args));
 }
 std::unique_ptr<SectionDefinition> Parser::parseSectionDefinition() {
-    Token tkn = eat(TokenType::KeywordSection, "expected keyword 'sect' for section definition");
+    casmlang::Token tkn =
+        eat(TokenType::KeywordSection, "expected keyword 'sect' for section definition");
 
     std::string type_string = tkn.lexeme;
 
@@ -161,7 +164,8 @@ std::unique_ptr<Global> Parser::parseGlobal() {
     return std::make_unique<Global>(identifier);
 }
 std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {
-    Token tkn = eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine definition");
+    casmlang::Token tkn =
+        eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine definition");
 
     std::string type_string = tkn.lexeme;
 
@@ -174,7 +178,8 @@ std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {
     return std::make_unique<RoutineDefinition>(identifier, std::move(scope), hasReturn);
 }
 std::unique_ptr<RoutineDeclaration> Parser::parseRoutineDeclaration() {
-    Token tkn = eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine declaration");
+    casmlang::Token tkn =
+        eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine declaration");
 
     std::string type_string = tkn.lexeme;
 
@@ -200,7 +205,7 @@ std::unique_ptr<FreeMemory> Parser::parseFreeMemory() {
     return std::make_unique<FreeMemory>(memname);
 }
 std::unique_ptr<MemoryName> Parser::parseMemoryName() {
-    Token tkn = peek();
+    casmlang::Token tkn = peek();
     if (check(TokenType::KeywordRegister)) {
         tkn = eat(TokenType::KeywordRegister, "internal, expected register for memory name");
         return std::make_unique<RegisterName>(tkn.location, tkn.lexeme);
@@ -289,7 +294,7 @@ std::unique_ptr<IntegerLiteral> Parser::parseInteger() {
         negative = true;
     }
 
-    Token tkn = eat(TokenType::IntegerLiteral, "expected integer literal");
+    casmlang::Token tkn = eat(TokenType::IntegerLiteral, "expected integer literal");
     return std::make_unique<IntegerLiteral>(tkn.location, std::stoi(tkn.lexeme));
 }
 std::unique_ptr<FloatLiteral> Parser::parseFloat() {
@@ -298,23 +303,23 @@ std::unique_ptr<FloatLiteral> Parser::parseFloat() {
         negative = true;
     }
 
-    Token tkn = eat(TokenType::FloatLiteral, "expected float literal");
+    casmlang::Token tkn = eat(TokenType::FloatLiteral, "expected float literal");
     return std::make_unique<FloatLiteral>(tkn.location, std::stof(tkn.lexeme));
 }
 std::unique_ptr<StringLiteral> Parser::parseString() {
-    Token tkn = eat(TokenType::StringLiteral, "expected a string literal");
+    casmlang::Token tkn = eat(TokenType::StringLiteral, "expected a string literal");
     return std::make_unique<StringLiteral>(tkn.location, tkn.lexeme);
 }
 
 // == HELPERS ==
-Token& Parser::peek(int offset) {
+casmlang::Token& Parser::peek(int offset) {
     if (cursor + offset > tokens.size()) {
         parserPanic("cannot peek into token number " + std::to_string(cursor + offset) +
                     "; such token does not exist.");
     }
     return tokens[cursor + offset];
 }
-Token& Parser::previous(int offset) {
+casmlang::Token& Parser::previous(int offset) {
     if (cursor - offset > tokens.size()) {
         parserPanic("cannot peek into previous token number " + std::to_string(cursor - offset) +
                     "; such token does not exist.");
@@ -349,11 +354,11 @@ void Parser::advance(int offset) {
     }
     cursor += offset;
 }
-Token Parser::eat(TokenType type, const std::string& msg) {
+casmlang::Token Parser::eat(TokenType type, const std::string& msg) {
     if (!check(type))
         parserPanic(msg, peek().location);
 
-    Token t = peek();
+    casmlang::Token t = peek();
     advance();
     return t;
 }
