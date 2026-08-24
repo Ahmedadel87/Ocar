@@ -12,11 +12,13 @@
     continue
 
 void Tokenizer::advance(int amount) {
-    if (peek() == '\n') {
-        column = 1;
-        row += amount;
-    } else {
-        column += amount;
+    for (int i = 0; i < amount; i++) {
+        if (peek(i) == '\n') {
+            column = 1;
+            row++;
+        } else {
+            column++;
+        }
     }
     cursor += amount;
 }
@@ -201,6 +203,9 @@ void Tokenizer::tokenize(const std::string& c) {
             advance();
             token(TokenType::CharLiteral, std::string(1, current()), location);
             advance();
+        } else {
+            panic("Invalid character '" + std::string(1, current()) + "' at " +
+                  std::to_string(row) + ":" + std::to_string(column));
         }
         next;
     }
