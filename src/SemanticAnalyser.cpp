@@ -186,6 +186,13 @@ void SemanticAnalyser::visit(VariableReference& node) {
         semaPanic("\"" + node.identifier + "\" is used as a variable even though it is a function",
                   node.location);
     }
+    std::string memname = find_memory_by_varname(node.identifier);
+    if (memname.empty()) {
+        semaPanic("cannot refernce variable \"" + node.identifier +
+                      "\" which is not assigned to any memory",
+                  node.location);
+    }
+    node.name = memname;
     analyseExpression(&node);
 }
 void SemanticAnalyser::visit(VariableReassignment& node) {
@@ -203,6 +210,7 @@ void SemanticAnalyser::visit(VariableReassignment& node) {
                   node.location);
     }
     node.memory = memname;
+    node.value->accept(*this);
 }
 void SemanticAnalyser::visit(VariableDefinition& node) {
     std::string& othervar = find_in_active_memory(node.memory);
@@ -210,6 +218,7 @@ void SemanticAnalyser::visit(VariableDefinition& node) {
         semaPanic("cannot reassign memory \"" + node.memory + "\" to \"" + node.identifier +
                   "\"; it is already taken by \"" + othervar + "\"");
     }
+    node.value->accept(*this);
     push_active_memory(node.memory, node.identifier);
     addSymbol(Symbol(node.identifier, SymbolKind::Variable));
 }

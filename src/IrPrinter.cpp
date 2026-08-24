@@ -30,6 +30,8 @@ void IrPrinter::dispatch_print(Ir* instr, std::ostream& stream) {
         instr_print(cst, stream);
     else if (auto cst = dynamic_cast<IrCmp*>(instr))
         instr_print(cst, stream);
+    else if (auto cst = dynamic_cast<IrMemName*>(instr))
+        instr_print(cst, stream);
     else
         panic("Internal, invalid print dispatch for instruction");
 }
@@ -80,6 +82,9 @@ void IrPrinter::instr_print(IrCmp* ins, std::ostream& stream) {
 
 void IrPrinter::instr_print(IrIntLit* ins, std::ostream& stream) {
     stream << ins->number;
+}
+void IrPrinter::instr_print(IrMemName* ins, std::ostream& stream) {
+    stream << ins->name;
 }
 
 void IrPrinter::load_ir(std::vector<std::unique_ptr<Ir>> ir_) {
