@@ -65,6 +65,7 @@ public:
     void visit(RoutineDeclaration& node) override;
     void visit(AsmInstruction& node) override;
     void visit(DeleteSymbol& node) override;
+    void visit(FreeMemory& node) override;
 
     std::unique_ptr<ScopeBlock> hand_over_AST();
     void load_ast(uq<ScopeBlock> ast_);

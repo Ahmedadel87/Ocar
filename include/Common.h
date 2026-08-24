@@ -34,6 +34,7 @@ enum class TokenType {
     KeywordGlobal,
     KeywordNoreturn,
     KeywordDelete,
+    KeywordFree,
 
     EndOfFile
 };
@@ -81,6 +82,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"global", TokenType::KeywordGlobal},
      {"noret", TokenType::KeywordNoreturn},
      {"delete", TokenType::KeywordDelete},
+     {"free", TokenType::KeywordFree},
 
      {"rax", TokenType::KeywordRegister},
      {"rbx", TokenType::KeywordRegister},
@@ -289,6 +291,13 @@ public:
 
     DeleteSymbol(const std::string& identifier_) : identifier(identifier_) {}
 };
+class FreeMemory : public Statement {
+public:
+    std::string memoryName;
+    void accept(Visitor& visitor) override;
+
+    FreeMemory(const std::string& memoryName_) : memoryName(memoryName_) {}
+};
 
 class Literal : public Expression {
 public:
@@ -355,6 +364,7 @@ public:
     virtual void visit(RoutineDeclaration& node) = 0;
     virtual void visit(AsmInstruction& node) = 0;
     virtual void visit(DeleteSymbol& node) = 0;
+    virtual void visit(FreeMemory& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -384,6 +394,7 @@ public:
     void visit(RoutineDeclaration& node) override;
     void visit(AsmInstruction& node) override;
     void visit(DeleteSymbol& node) override;
+    void visit(FreeMemory& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -441,5 +452,8 @@ inline void AsmInstruction::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void DeleteSymbol::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void FreeMemory::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

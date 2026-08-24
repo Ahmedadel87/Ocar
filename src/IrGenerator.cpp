@@ -68,3 +68,4 @@ void casmlang::IrGenerator::visit(AsmInstruction& node) {
     ir.push_back(std::make_unique<IrAsm>(node.instruction));
 }
 void casmlang::IrGenerator::visit(DeleteSymbol& node) {}
+void casmlang::IrGenerator::visit(FreeMemory& node) {}

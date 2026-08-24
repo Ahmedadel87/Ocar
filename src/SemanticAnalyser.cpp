@@ -274,3 +274,12 @@ void SemanticAnalyser::visit(DeleteSymbol& node) {
         semaPanic("Internal, cannot erase memory \"" + it->first + "\" occupied by \"" +
                   it->second + "\"");
 }
+void SemanticAnalyser::visit(FreeMemory& node) {
+    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
+                           [&](const auto& p) { return p.first == node.memoryName; });
+
+    if (it != activeMemory.end())
+        activeMemory.erase(it);
+    else
+        semaPanic("Cannot free memory \"" + node.memoryName + "\"; it is not occupied");
+}

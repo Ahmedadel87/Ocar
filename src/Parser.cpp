@@ -59,6 +59,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return std::make_unique<AsmInstruction>(instr);
     } else if (check(TokenType::KeywordDelete))
         return parseDeleteVar();
+    else if (check(TokenType::KeywordFree))
+        return parseFreeMemory();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -184,6 +186,19 @@ std::unique_ptr<DeleteSymbol> Parser::parseDeleteVar() {
     eat(TokenType::Semicolon, "expected semicolon afted delete statement");
 
     return std::make_unique<DeleteSymbol>(identifier);
+}
+std::unique_ptr<FreeMemory> Parser::parseFreeMemory() {
+    auto tkn = eat(TokenType::KeywordFree, "expected keyword 'free' for free statement");
+    auto memname = parseMemoryName();
+    eat(TokenType::Semicolon, "expected semicolon afted free statement");
+
+    return std::make_unique<FreeMemory>(memname);
+}
+std::string Parser::parseMemoryName() {
+    auto tkn = eat(TokenType::KeywordRegister, "expected register for memory name");
+    // right now, memory names are bound to registers
+    // perhaps in the future stack memory may be implemented
+    return tkn.lexeme;
 }
 
 // == EXPRESSION PARSERS ==

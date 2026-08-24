@@ -36,9 +36,11 @@ private:
             std::unique_ptr<StringLiteral> parseString();
 
         std::unique_ptr<RoutineCallExpr> parseFunctionCallExpr();
-        
+    
+    std::string parseMemoryName();
     std::unique_ptr<Statement> parseStatement();
     std::unique_ptr<DeleteSymbol> parseDeleteVar();
+    std::unique_ptr<FreeMemory> parseFreeMemory();
     std::unique_ptr<Global> parseGlobal();
     std::unique_ptr<RoutineDefinition> parseRoutineDefinition();
     std::unique_ptr<RoutineDeclaration> parseRoutineDeclaration();

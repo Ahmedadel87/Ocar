@@ -131,3 +131,6 @@ void PrettyPrinter::visit(AsmInstruction& node) {
 void PrettyPrinter::visit(DeleteSymbol& node) {
     stream << "delete " << node.identifier;
 }
+void PrettyPrinter::visit(FreeMemory& node) {
+    stream << "free memory " << node.memoryName;
+}

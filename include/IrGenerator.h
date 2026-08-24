@@ -160,6 +160,7 @@ public:
     void visit(RoutineDeclaration& node) override;
     void visit(AsmInstruction& node) override;
     void visit(DeleteSymbol& node) override;
+    void visit(FreeMemory& node) override;
 };
 
 } // namespace casmlang
