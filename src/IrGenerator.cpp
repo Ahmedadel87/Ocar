@@ -58,10 +58,14 @@ void casmlang::IrGenerator::visit(RoutineCallStmt& node) {
     ir.push_back(std::make_unique<IrRtnCall>(node.identifier));
 };
 void casmlang::IrGenerator::visit(RoutineDefinition& node) {
+    std::string endLabel = generateLabel();
+    ir.push_back(std::make_unique<IrJmp>(
+        endLabel)); // a jump so the function isn't accidentally ran depending on the placement
     ir.push_back(std::make_unique<IrLabelStmt>(node.identifier));
     node.scope->accept(*this);
     if (node.hasRet)
         ir.push_back(std::make_unique<IrRetStmt>());
+    ir.push_back(std::make_unique<IrLabelStmt>(endLabel));
 };
 void casmlang::IrGenerator::visit(SectionDefinition& node) {
     ir.push_back(std::make_unique<IrSection>(node.identifier));
