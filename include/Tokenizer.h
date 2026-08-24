@@ -36,6 +36,10 @@ private:
     char current() const;
     bool is_character(const char c);
 
+    // == PREPROCESSOR ==
+    void prcs_process();
+    void prcs_process_include();
+
 public:
     void tokenize(const std::string& c);
     std::vector<Token>& get_tokens();

@@ -76,6 +76,24 @@ bool Tokenizer::is_character(const char c) {
     return (std::string_view(".,:;-><+-/=!&*(){}[]#|").find(c) != std::string_view::npos);
 }
 
+void Tokenizer::prcs_process() {
+    if (current() != '#')
+        panic("Cannot preprocess line that does not start with '#'");
+    advance();
+
+    std::string command = "";
+    while (!eof() && current() != ' ') {
+        command += current();
+        advance();
+    }
+    advance(); // skip space
+
+    if (command == "include") {
+        prcs_process_include();
+    }
+}
+void Tokenizer::prcs_process_include() {}
+
 void Tokenizer::tokenize(const std::string& c) {
     code = c;
     cursor = 0;
@@ -213,4 +231,4 @@ void Tokenizer::tokenize(const std::string& c) {
 
     token(TokenType::EndOfFile, "\0", SourceLocation(row, column));
 }
-}
+} // namespace casmlang
