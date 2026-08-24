@@ -290,3 +290,27 @@ void SemanticAnalyser::visit(IfStatement& node) {
 
     node.scope->accept(*this);
 }
+void SemanticAnalyser::visit(Compare& node) {
+    std::vector<MemoryName*> cdr = {node.left.get(), node.right.get()};
+
+    for (auto& child : cdr) { // no need to copy logic, iterate through childreen
+        if (auto var = dynamic_cast<VariableReference*>(child)) {
+            if (!symbolExists(var->identifier))
+                semaPanic("can't compare variable \"" + var->identifier + "\"; it is not declared",
+                          node.location);
+            auto symbol = getSymbol(var->identifier);
+            if (symbol->kind != SymbolKind::Variable)
+                semaPanic("can't compare symbol \"" + var->identifier + "\"; it is not a variable",
+                          node.location);
+
+            child->name = find_memory_by_varname(var->name);
+        } else if (auto reg = dynamic_cast<RegisterName*>(child)) {
+            child->name = reg->name;
+        }
+    }
+}
+void SemanticAnalyser::visit(RegisterName& node) {
+    if (std::find(registers.begin(), registers.end(), node.name) == registers.end()) {
+        semaPanic("invalid register name \"" + node.name + "\"", node.location);
+    }
+}

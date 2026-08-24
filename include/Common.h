@@ -37,6 +37,7 @@ enum class TokenType {
     KeywordFree,
     KeywordIf,
     KeywordCompareCond,
+    KeywordCompare,
 
     EndOfFile
 };
@@ -69,6 +70,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"delete", TokenType::KeywordDelete},
      {"free", TokenType::KeywordFree},
      {"if", TokenType::KeywordIf},
+     {"compare", TokenType::KeywordCompare},
 
      {"greater", TokenType::KeywordCompareCond},
      {"greater_equal", TokenType::KeywordCompareCond},
@@ -114,6 +116,24 @@ struct ExpressionInfo {
     ExpressionInfo(bool isLValue_ = false, bool isConstant_ = false)
         : isLValue(isLValue_), isConstant(isConstant_) {}
 };
+const std::array<std::string, 16> registers = {{
+    "rax",
+    "rbx",
+    "rcx",
+    "rdx",
+    "rsi",
+    "rdi",
+    "rbp",
+    "rsp",
+    "r8",
+    "r9",
+    "r10",
+    "r11",
+    "r12",
+    "r13",
+    "r14",
+    "r15",
+}};
 
 class Visitor;
 class PrettyPrinter;
@@ -141,6 +161,15 @@ public:
 
     Expression(const SourceLocation& lct) : location(lct) {}
 };
+class MemoryName : public Expression {
+public:
+    std::string name; // annotated by the semantic analyser
+    virtual ~MemoryName() = default;
+    virtual void accept(Visitor& visitor) = 0;
+
+    MemoryName(const SourceLocation& lct, const std::string& name_ = "")
+        : Expression(lct), name(name_) {}
+};
 class BinaryExpression : public Expression {
 public:
     std::unique_ptr<Expression> left;
@@ -162,13 +191,19 @@ public:
                     std::vector<std::unique_ptr<Expression>> args_)
         : Expression(src), identifier(identifier_), args(std::move(args_)) {}
 };
-class VariableReference : public Expression {
+class VariableReference : public MemoryName {
 public:
     std::string identifier;
 
     void accept(Visitor& visitor) override;
     VariableReference(const SourceLocation& src, const std::string& identifier_)
-        : Expression(src), identifier(identifier_) {}
+        : MemoryName(src), identifier(identifier_) {}
+};
+class RegisterName : public MemoryName {
+public:
+    void accept(Visitor& visitor) override;
+    RegisterName(const SourceLocation& src, const std::string& registerName_)
+        : MemoryName(src, registerName_) {}
 };
 class UnaryExpression : public Expression {
 public:
@@ -302,6 +337,16 @@ public:
                 std::unique_ptr<ScopeBlock> scope_)
         : ConditionalStatement(lct), cond(cond_), scope(std::move(scope_)) {}
 };
+class Compare : public Statement {
+public:
+    std::unique_ptr<MemoryName> left;
+    std::unique_ptr<MemoryName> right;
+    void accept(Visitor& visitor) override;
+
+    Compare(const SourceLocation& lct, std::unique_ptr<MemoryName> left_,
+            std::unique_ptr<MemoryName> right_)
+        : Statement(lct), left(std::move(left_)), right(std::move(right_)) {}
+};
 
 class Literal : public Expression {
 public:
@@ -359,6 +404,7 @@ public:
     virtual void visit(BinaryExpression& node) = 0;
     virtual void visit(RoutineCallExpr& node) = 0;
     virtual void visit(VariableReference& node) = 0;
+    virtual void visit(RegisterName& node) = 0;
     virtual void visit(UnaryExpression& node) = 0;
     virtual void visit(VariableReassignment& node) = 0;
     virtual void visit(RoutineCallStmt& node) = 0;
@@ -370,6 +416,7 @@ public:
     virtual void visit(DeleteSymbol& node) = 0;
     virtual void visit(FreeMemory& node) = 0;
     virtual void visit(IfStatement& node) = 0;
+    virtual void visit(Compare& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -401,6 +448,8 @@ public:
     void visit(DeleteSymbol& node) override;
     void visit(FreeMemory& node) override;
     void visit(IfStatement& node) override;
+    void visit(Compare& node) override;
+    void visit(RegisterName& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -464,5 +513,11 @@ inline void FreeMemory::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void IfStatement::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void Compare::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void RegisterName::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

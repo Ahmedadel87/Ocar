@@ -149,3 +149,14 @@ void PrettyPrinter::visit(IfStatement& node) {
     }
     indent--;
 }
+void PrettyPrinter::visit(Compare& node) {
+    printIndent();
+    stream << "compare ";
+    node.left->accept(*this);
+    stream << " & ";
+    node.right->accept(*this);
+}
+void PrettyPrinter::visit(RegisterName& node) {
+    printIndent();
+    stream << "(reg)" << node.name;
+}

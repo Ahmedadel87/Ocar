@@ -2,6 +2,7 @@
 #include "../include/Common.h"
 #include "../include/ErrorHandler.h"
 #include "Tokenizer.h"
+#include <algorithm>
 #include <iostream>
 
 void Parser::load_tokens(std::vector<Token> tkns) {
@@ -63,6 +64,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseFreeMemory();
     else if (check(TokenType::KeywordIf))
         return parseIfStatement();
+    else if (check(TokenType::KeywordCompare))
+        return parseCompareStatement();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -191,16 +194,21 @@ std::unique_ptr<DeleteSymbol> Parser::parseDeleteVar() {
 }
 std::unique_ptr<FreeMemory> Parser::parseFreeMemory() {
     auto tkn = eat(TokenType::KeywordFree, "expected keyword 'free' for free statement");
-    auto memname = parseMemoryName();
+    auto memname = parseMemoryName()->name;
     eat(TokenType::Semicolon, "expected semicolon afted free statement");
 
     return std::make_unique<FreeMemory>(memname);
 }
-std::string Parser::parseMemoryName() {
+std::unique_ptr<MemoryName> Parser::parseMemoryName() {
     auto tkn = eat(TokenType::KeywordRegister, "expected register for memory name");
     // right now, memory names are bound to registers
     // perhaps in the future stack memory may be implemented
-    return tkn.lexeme;
+
+    if (std::find(registers.begin(), registers.end(), tkn.lexeme) != registers.end()) {
+        // it's a register name
+        return std::make_unique<RegisterName>(tkn.location, tkn.lexeme);
+    }
+    return std::make_unique<VariableReference>(tkn.location, tkn.lexeme);
 }
 std::unique_ptr<IfStatement> Parser::parseIfStatement() {
     auto tkn = eat(TokenType::KeywordIf, "expectede keyword 'if' for if statement");
@@ -225,6 +233,13 @@ std::unique_ptr<IfStatement> Parser::parseIfStatement() {
         parserPanic("invalid condition \"" + cond_string + "\"", tkn.location);
 
     return std::make_unique<IfStatement>(tkn.location, cond, std::move(scope));
+}
+std::unique_ptr<Compare> Parser::parseCompareStatement() {
+    auto tkn = eat(TokenType::KeywordCompare, "expected keyword 'compare' for compare statement");
+    auto left = parseMemoryName();
+    eat(TokenType::Comma, "expected comma after first memory name in 'compare' statement");
+    auto right = parseMemoryName();
+    return std::make_unique<Compare>(tkn.location, std::move(left), std::move(right));
 }
 
 // == EXPRESSION PARSERS ==

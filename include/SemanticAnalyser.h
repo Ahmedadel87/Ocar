@@ -67,6 +67,8 @@ public:
     void visit(DeleteSymbol& node) override;
     void visit(FreeMemory& node) override;
     void visit(IfStatement& node) override;
+    void visit(Compare& node) override;
+    void visit(RegisterName& node) override;
 
     std::unique_ptr<ScopeBlock> hand_over_AST();
     void load_ast(uq<ScopeBlock> ast_);

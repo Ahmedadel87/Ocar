@@ -44,6 +44,15 @@ public:
         stream << "(int)" << number;
     }
 };
+class IrMemName : public IrExpr {
+public:
+    std::string name;
+    IrMemName(const std::string& name_) : name(name_) {}
+
+    void print(std::ostream& stream) const override {
+        stream << "(mem)" << name;
+    }
+};
 
 class IrStmt : public Ir {
 public:
@@ -126,6 +135,16 @@ public:
         stream << name << " " << location;
     }
 };
+class IrCmp : public IrStmt {
+public:
+    std::string left;
+    std::string right;
+
+    IrCmp(const std::string& left_, const std::string& right_) : left(left_), right(right_) {}
+    void print(std::ostream& stream) const override {
+        stream << "cmp " << left << ", " << right;
+    }
+};
 
 class IrGenerator : public Visitor {
 private:
@@ -171,6 +190,7 @@ public:
     void visit(BinaryExpression& node) override;
     void visit(RoutineCallExpr& node) override;
     void visit(VariableReference& node) override;
+    void visit(RegisterName& node) override;
     void visit(UnaryExpression& node) override;
     void visit(VariableReassignment& node) override;
     void visit(RoutineCallStmt& node) override;
@@ -182,6 +202,7 @@ public:
     void visit(DeleteSymbol& node) override;
     void visit(FreeMemory& node) override;
     void visit(IfStatement& node) override;
+    void visit(Compare& node) override;
 };
 
 } // namespace casmlang
