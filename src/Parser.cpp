@@ -61,6 +61,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseDeleteVar();
     else if (check(TokenType::KeywordFree))
         return parseFreeMemory();
+    else if (check(TokenType::KeywordIf))
+        return parseIfStatement();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -199,6 +201,30 @@ std::string Parser::parseMemoryName() {
     // right now, memory names are bound to registers
     // perhaps in the future stack memory may be implemented
     return tkn.lexeme;
+}
+std::unique_ptr<IfStatement> Parser::parseIfStatement() {
+    auto tkn = eat(TokenType::KeywordIf, "expectede keyword 'if' for if statement");
+    auto cond_string = eat(TokenType::KeywordCompareCond).lexeme;
+    auto scope = parseScope(true);
+
+    using CC = ComparativeConditions;
+    CC cond;
+    if (cond_string == "greater")
+        cond = CC::GT;
+    else if (cond_string == "greater_equal")
+        cond = CC::GTEQ;
+    else if (cond_string == "less")
+        cond = CC::LT;
+    else if (cond_string == "less_equal")
+        cond = CC::LTEQ;
+    else if (cond_string == "equal")
+        cond = CC::EQ;
+    else if (cond_string == "not_equal")
+        cond = CC::NEQ;
+    else
+        parserPanic("invalid condition \"" + cond_string + "\"", tkn.location);
+
+    return std::make_unique<IfStatement>(tkn.location, cond, std::move(scope));
 }
 
 // == EXPRESSION PARSERS ==

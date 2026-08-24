@@ -35,28 +35,10 @@ enum class TokenType {
     KeywordNoreturn,
     KeywordDelete,
     KeywordFree,
+    KeywordIf,
+    KeywordCompareCond,
 
     EndOfFile
-};
-enum class UnaryOperation { COMPLEMENT, INCREMENT, DECREMENT, NEGATE };
-enum class BinaryOperation {
-    ADD,
-    SUBTRACT,
-    MULTIPLY,
-    DIVIDE,
-    POWER,
-    ASSIGN,
-
-    EQUALS,
-    NOT_EQUALS,
-    GREATER_THAN,
-    GREATER_THAN_OR_EQUAL,
-    LESS_THAN,
-    LESS_THAN_OR_EQUAL,
-
-    LOGICAL_AND,
-    LOGICAL_OR,
-    LOGICAL_XOR
 };
 enum class AssignOperation {
     ASSIGN,
@@ -66,6 +48,9 @@ enum class AssignOperation {
     DIVIDEASSIGN,
     POWERASSIGN
 };
+enum class ComparativeConditions { EQ, NEQ, LT, LTEQ, GT, GTEQ };
+enum class BinaryOperation { ADD, SUBTRACT, MULTIPLY, DIVIDE };
+enum class UnaryOperation { COMPLEMENT, DECREMENT, INCREMENT, NEGATE };
 
 class SourceLocation {
 public:
@@ -83,6 +68,14 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"noret", TokenType::KeywordNoreturn},
      {"delete", TokenType::KeywordDelete},
      {"free", TokenType::KeywordFree},
+     {"if", TokenType::KeywordIf},
+
+     {"greater", TokenType::KeywordCompareCond},
+     {"greater_equal", TokenType::KeywordCompareCond},
+     {"less", TokenType::KeywordCompareCond},
+     {"less_equal", TokenType::KeywordCompareCond},
+     {"equal", TokenType::KeywordCompareCond},
+     {"not_equal", TokenType::KeywordCompareCond},
 
      {"rax", TokenType::KeywordRegister},
      {"rbx", TokenType::KeywordRegister},
@@ -204,6 +197,7 @@ public:
     virtual void accept(Visitor& visitor) = 0;
 
     ConditionalStatement(const SourceLocation& lct) : Statement(lct) {}
+    ConditionalStatement() : Statement() {}
 };
 class VariableDefinition : public Statement {
 public:
@@ -298,6 +292,16 @@ public:
 
     FreeMemory(const std::string& memoryName_) : memoryName(memoryName_) {}
 };
+class IfStatement : public ConditionalStatement {
+public:
+    ComparativeConditions cond;
+    std::unique_ptr<ScopeBlock> scope;
+    void accept(Visitor& visitor) override;
+
+    IfStatement(SourceLocation& lct, ComparativeConditions cond_,
+                std::unique_ptr<ScopeBlock> scope_)
+        : ConditionalStatement(lct), cond(cond_), scope(std::move(scope_)) {}
+};
 
 class Literal : public Expression {
 public:
@@ -365,6 +369,7 @@ public:
     virtual void visit(AsmInstruction& node) = 0;
     virtual void visit(DeleteSymbol& node) = 0;
     virtual void visit(FreeMemory& node) = 0;
+    virtual void visit(IfStatement& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -395,6 +400,7 @@ public:
     void visit(AsmInstruction& node) override;
     void visit(DeleteSymbol& node) override;
     void visit(FreeMemory& node) override;
+    void visit(IfStatement& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -455,5 +461,8 @@ inline void DeleteSymbol::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void FreeMemory::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void IfStatement::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

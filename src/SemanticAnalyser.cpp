@@ -284,3 +284,9 @@ void SemanticAnalyser::visit(FreeMemory& node) {
     } else
         semaPanic("Cannot free memory \"" + node.memoryName + "\"; it is not occupied");
 }
+void SemanticAnalyser::visit(IfStatement& node) {
+    // the condition is an enum, nothing could possibly go wrong
+    // (right?)
+
+    node.scope->accept(*this);
+}

@@ -3,8 +3,14 @@
 #include "ErrorHandler.h"
 #include <memory>
 #include <ostream>
+#include <unordered_map>
 
 namespace casmlang {
+const std::unordered_map<ComparativeConditions, std::string> condMap = {
+    {ComparativeConditions::EQ, "je"}, {ComparativeConditions::NEQ, "jne"},
+    {ComparativeConditions::GT, "jg"}, {ComparativeConditions::GTEQ, "jge"},
+    {ComparativeConditions::LT, "jl"}, {ComparativeConditions::LTEQ, "jle"}};
+
 class Ir {
 public:
     virtual ~Ir() = default;
@@ -108,12 +114,26 @@ public:
         stream << "@" << instruction;
     }
 };
+class IrJmp : public IrStmt {
+public:
+    std::string name = "jmp";
+    std::string location;
+
+    IrJmp(const std::string& location_, const std::string& name_ = "jmp")
+        : name(name_), location(location_) {}
+
+    void print(std::ostream& stream) const override {
+        stream << name << " " << location;
+    }
+};
 
 class IrGenerator : public Visitor {
 private:
+    int labelCounter;
     std::unique_ptr<ScopeBlock> entry_point;
     std::vector<std::unique_ptr<Ir>> ir;
     std::unique_ptr<Ir> currentNode;
+    std::string generateLabel();
 
     template <typename T> std::unique_ptr<T> get_current_as(const std::string& err = "") {
         if (!currentNode.get())
@@ -161,6 +181,7 @@ public:
     void visit(AsmInstruction& node) override;
     void visit(DeleteSymbol& node) override;
     void visit(FreeMemory& node) override;
+    void visit(IfStatement& node) override;
 };
 
 } // namespace casmlang

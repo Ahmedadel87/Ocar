@@ -120,17 +120,32 @@ void PrettyPrinter::visit(SectionDefinition& node) {
     indent--;
 }
 void PrettyPrinter::visit(Global& node) {
+    printIndent();
     stream << "global " << node.identifier;
 }
 void PrettyPrinter::visit(RoutineDeclaration& node) {
+    printIndent();
     stream << "FunctionDeclaration " << node.identifier;
 }
 void PrettyPrinter::visit(AsmInstruction& node) {
+    printIndent();
     stream << "raw instruction: " << node.instruction;
 }
 void PrettyPrinter::visit(DeleteSymbol& node) {
+    printIndent();
     stream << "delete " << node.identifier;
 }
 void PrettyPrinter::visit(FreeMemory& node) {
+    printIndent();
     stream << "free memory " << node.memoryName;
+}
+void PrettyPrinter::visit(IfStatement& node) {
+    printIndent();
+    stream << "if " << (int)node.cond;
+
+    indent++;
+    for (auto& child : node.scope->children) {
+        child->accept(*this);
+    }
+    indent--;
 }

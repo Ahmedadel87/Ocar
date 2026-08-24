@@ -44,7 +44,9 @@ The `@` prefix means that those instructions will translate literally to assembl
 - [ ] Raw register access (e.g. `raw rax = 5`)
 - [ ] Variable support for assignment (allow `rax a = b;`)
 - [ ] Four operations
-- [ ] Branching
+- [x] If statements
+  - [ ] Comparisons
+  - [ ] Else statements
 - [ ] Goto and labels
 - [ ] Add linking. Probably C-style, because it's easier.
   - [ ] Make a standard library
