@@ -38,7 +38,7 @@ rtn _start() noret {
 The `@` prefix means that those instructions will translate literally to assembly. Because the language does not currently provide `mov` or `syscall` instructions, they have to be manually placed by the user.
 
 ## To-do list
-- [ ] Add register freeing (e.g. `free rax`, `free rdi`)
+- [x] Add register freeing (e.g. `free rax`, `free rdi`)
 - [x] Add multiline comments
 - [ ] Add `syscall` operation
 - [ ] Raw register access (e.g. `raw rax = 5`)
