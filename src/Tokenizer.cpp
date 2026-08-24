@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -77,37 +78,6 @@ void Tokenizer::pretty_print(std::ostream& os) {
 }
 bool Tokenizer::is_character(const char c) {
     return (std::string_view(".,:;-><+-/=!&*(){}[]#|").find(c) != std::string_view::npos);
-}
-
-void Tokenizer::prcs_process() {
-    if (current() != '#')
-        panic("Cannot preprocess line that does not start with '#'");
-    advance();
-
-    std::string command = "";
-    while (!eof() && current() != ' ') {
-        command += current();
-        advance();
-    }
-    advance(); // skip space
-
-    if (command == "stdlib") {
-        prcs_process_include();
-    }
-}
-void Tokenizer::prcs_process_include() {
-    fs::path stdlib = CASMLANG_STDLIB_PATH;
-
-    std::string arg;
-    while (current() != '\n') {
-        arg += current();
-        advance();
-    }
-
-    std::cout << (fs::exists(stdlib / (arg + ".casm")) ? "file found" : "file not found")
-              << std::endl;
-
-    advance();
 }
 
 void Tokenizer::tokenize(const std::string& c) {
