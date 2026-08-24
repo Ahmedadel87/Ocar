@@ -278,8 +278,9 @@ void SemanticAnalyser::visit(FreeMemory& node) {
     auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
                            [&](const auto& p) { return p.first == node.memoryName; });
 
-    if (it != activeMemory.end())
+    if (it != activeMemory.end()) {
+        removeSymbol(it->second);
         activeMemory.erase(it);
-    else
+    } else
         semaPanic("Cannot free memory \"" + node.memoryName + "\"; it is not occupied");
 }
