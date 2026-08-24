@@ -129,7 +129,7 @@ public:
 
 class IrGenerator : public Visitor {
 private:
-    int labelCounter;
+    int labelCounter = 0;
     std::unique_ptr<ScopeBlock> entry_point;
     std::vector<std::unique_ptr<Ir>> ir;
     std::unique_ptr<Ir> currentNode;
