@@ -2,6 +2,7 @@
 #include "ErrorHandler.h"
 #include <algorithm>
 #include <cctype>
+#include <filesystem>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -12,6 +13,8 @@
     continue
 
 namespace casmlang {
+namespace fs = std::filesystem;
+
 void Tokenizer::advance(int amount) {
     for (int i = 0; i < amount; i++) {
         if (peek(i) == '\n') {
@@ -88,11 +91,24 @@ void Tokenizer::prcs_process() {
     }
     advance(); // skip space
 
-    if (command == "include") {
+    if (command == "stdlib") {
         prcs_process_include();
     }
 }
-void Tokenizer::prcs_process_include() {}
+void Tokenizer::prcs_process_include() {
+    fs::path stdlib = CASMLANG_STDLIB_PATH;
+
+    std::string arg;
+    while (current() != '\n') {
+        arg += current();
+        advance();
+    }
+
+    std::cout << (fs::exists(stdlib / (arg + ".casm")) ? "file found" : "file not found")
+              << std::endl;
+
+    advance();
+}
 
 void Tokenizer::tokenize(const std::string& c) {
     code = c;
@@ -123,6 +139,10 @@ void Tokenizer::tokenize(const std::string& c) {
                 continue;
             // encountered the ending "*/" sequence
             advance(2);
+            continue;
+        }
+        if (current() == '#') {
+            prcs_process();
             continue;
         }
 

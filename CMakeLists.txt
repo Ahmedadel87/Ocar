@@ -18,3 +18,6 @@ target_include_directories(CasmLang
         ${CMAKE_SOURCE_DIR}/include
 )
 target_compile_features(CasmLang PRIVATE cxx_std_20)
+target_compile_definitions(CasmLang PRIVATE
+    CASMLANG_STDLIB_PATH="${CMAKE_SOURCE_DIR}/stdlib"
+)
