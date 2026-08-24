@@ -95,6 +95,15 @@ void Tokenizer::tokenize(const std::string& c) {
             }
             continue;
         }
+        if (current() == '/' && peek() == '*') {
+            while (!eof() && !(current() == '*' && peek() == '/'))
+                advance();
+            if (eof())
+                continue;
+            // encountered the ending "*/" sequence
+            advance(2);
+            continue;
+        }
 
         SourceLocation location(row, column);
         if (std::isalpha(current()) || current() == '_') {
