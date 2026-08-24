@@ -303,7 +303,7 @@ void SemanticAnalyser::visit(Compare& node) {
                 semaPanic("can't compare symbol \"" + var->identifier + "\"; it is not a variable",
                           node.location);
 
-            child->name = find_memory_by_varname(var->name);
+            child->name = find_memory_by_varname(var->identifier);
         } else if (auto reg = dynamic_cast<RegisterName*>(child)) {
             child->name = reg->name;
         }

@@ -45,7 +45,9 @@ void casmlang::IrGenerator::visit(VariableDefinition& node) {
 };
 void casmlang::IrGenerator::visit(BinaryExpression& node) {};
 void casmlang::IrGenerator::visit(RoutineCallExpr& node) {};
-void casmlang::IrGenerator::visit(VariableReference& node) {};
+void casmlang::IrGenerator::visit(VariableReference& node) {
+    currentNode = std::make_unique<IrMemName>(node.name);
+};
 void casmlang::IrGenerator::visit(UnaryExpression& node) {};
 void casmlang::IrGenerator::visit(VariableReassignment& node) {
     node.value->accept(*this);

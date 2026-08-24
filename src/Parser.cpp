@@ -200,15 +200,17 @@ std::unique_ptr<FreeMemory> Parser::parseFreeMemory() {
     return std::make_unique<FreeMemory>(memname);
 }
 std::unique_ptr<MemoryName> Parser::parseMemoryName() {
-    auto tkn = eat(TokenType::KeywordRegister, "expected register for memory name");
-    // right now, memory names are bound to registers
-    // perhaps in the future stack memory may be implemented
-
-    if (std::find(registers.begin(), registers.end(), tkn.lexeme) != registers.end()) {
-        // it's a register name
+    Token tkn = peek();
+    if (check(TokenType::KeywordRegister)) {
+        tkn = eat(TokenType::KeywordRegister, "internal, expected register for memory name");
         return std::make_unique<RegisterName>(tkn.location, tkn.lexeme);
+    } else if (check(TokenType::Identifier)) {
+        tkn = eat(TokenType::Identifier, "internal, expected identifier for memory name");
+        return std::make_unique<VariableReference>(tkn.location, tkn.lexeme);
+    } else {
+        parserPanic("expected variable identifier or register name for memory name", tkn.location);
     }
-    return std::make_unique<VariableReference>(tkn.location, tkn.lexeme);
+    return std::make_unique<VariableReference>(SourceLocation(), ""); // to quiet down the warnings
 }
 std::unique_ptr<IfStatement> Parser::parseIfStatement() {
     auto tkn = eat(TokenType::KeywordIf, "expectede keyword 'if' for if statement");
