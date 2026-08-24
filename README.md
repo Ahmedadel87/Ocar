@@ -39,7 +39,7 @@ The `@` prefix means that those instructions will translate literally to assembl
 
 ## To-do list
 - [ ] Add register freeing (e.g. `free rax`, `free rdi`)
-- [ ] Add multiline comments
+- [x] Add multiline comments
 - [ ] Add `syscall` operation
 - [ ] Raw register access (e.g. `raw rax = 5`)
 - [ ] Variable support for assignment (allow `rax a = b;`)
