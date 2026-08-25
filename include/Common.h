@@ -172,14 +172,56 @@ public:
 
     Expression(const SourceLocation& lct) : location(lct) {}
 };
-class MemoryName : public Expression {
+class Literal : public Expression {
+public:
+    virtual ~Literal() = default;
+
+    Literal(const SourceLocation& lct) : Expression(lct) {}
+    virtual void accept(Visitor& visitor) = 0;
+};
+class StringLiteral : public Literal {
+public:
+    std::string string;
+
+    StringLiteral(const SourceLocation& lct, const std::string str = "")
+        : Literal(lct), string(str) {}
+    void accept(Visitor& visitor) override;
+};
+class FloatLiteral : public Literal {
+public:
+    float number;
+
+    FloatLiteral(const SourceLocation& lct, const float number_) : Literal(lct), number(number_) {}
+    void accept(Visitor& visitor) override;
+};
+class IntegerLiteral : public Literal {
+public:
+    int number;
+
+    IntegerLiteral(const SourceLocation& lct, const float number_)
+        : Literal(lct), number(number_) {}
+    void accept(Visitor& visitor) override;
+};
+class BooleanLiteral : public Literal {
+public:
+    bool state;
+
+    BooleanLiteral(const SourceLocation& lct, const bool state_) : Literal(lct), state(state_) {}
+    void accept(Visitor& visitor) override;
+};
+class VoidLiteral : public Literal {
+public:
+    void accept(Visitor& visitor) override;
+};
+
+class MemoryName : public Literal {
 public:
     std::string name; // annotated by the semantic analyser
     virtual ~MemoryName() = default;
     virtual void accept(Visitor& visitor) = 0;
 
     MemoryName(const SourceLocation& lct, const std::string& name_ = "")
-        : Expression(lct), name(name_) {}
+        : Literal(lct), name(name_) {}
 };
 class BinaryExpression : public Expression {
 public:
@@ -381,48 +423,6 @@ public:
     RawAssignment(const SourceLocation& lct, std::unique_ptr<MemoryName> left_,
                   std::unique_ptr<Expression> right_)
         : Statement(lct), left(std::move(left_)), right(std::move(right_)) {}
-    void accept(Visitor& visitor) override;
-};
-
-class Literal : public Expression {
-public:
-    virtual ~Literal() = default;
-
-    Literal(const SourceLocation& lct) : Expression(lct) {}
-    virtual void accept(Visitor& visitor) = 0;
-};
-class StringLiteral : public Literal {
-public:
-    std::string string;
-
-    StringLiteral(const SourceLocation& lct, const std::string str = "")
-        : Literal(lct), string(str) {}
-    void accept(Visitor& visitor) override;
-};
-class FloatLiteral : public Literal {
-public:
-    float number;
-
-    FloatLiteral(const SourceLocation& lct, const float number_) : Literal(lct), number(number_) {}
-    void accept(Visitor& visitor) override;
-};
-class IntegerLiteral : public Literal {
-public:
-    int number;
-
-    IntegerLiteral(const SourceLocation& lct, const float number_)
-        : Literal(lct), number(number_) {}
-    void accept(Visitor& visitor) override;
-};
-class BooleanLiteral : public Literal {
-public:
-    bool state;
-
-    BooleanLiteral(const SourceLocation& lct, const bool state_) : Literal(lct), state(state_) {}
-    void accept(Visitor& visitor) override;
-};
-class VoidLiteral : public Literal {
-public:
     void accept(Visitor& visitor) override;
 };
 

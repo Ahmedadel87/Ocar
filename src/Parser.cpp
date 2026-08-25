@@ -331,21 +331,28 @@ std::unique_ptr<Expression> Parser::parseFactor() {
 }
 std::unique_ptr<Literal> Parser::parseLiteral() {
     auto token = peek();
-    advance();
+    std::unique_ptr<Literal> returnNode;
+    bool doAdvance = true;
 
     if (token.type == TokenType::StringLiteral) {
-        return std::make_unique<StringLiteral>(token.location, token.lexeme);
+        returnNode = std::make_unique<StringLiteral>(token.location, token.lexeme);
     } else if (token.type == TokenType::BoolLiteral &&
                (token.lexeme == "true" || token.lexeme == "false")) {
-        return std::make_unique<BooleanLiteral>(token.location, token.lexeme == "true");
+        returnNode = std::make_unique<BooleanLiteral>(token.location, token.lexeme == "true");
     } else if (token.type == TokenType::IntegerLiteral) {
-        return std::make_unique<IntegerLiteral>(token.location, std::stoi(token.lexeme));
+        returnNode = std::make_unique<IntegerLiteral>(token.location, std::stoi(token.lexeme));
     } else if (token.type == TokenType::FloatLiteral) {
-        return std::make_unique<FloatLiteral>(token.location, std::stof(token.lexeme));
+        returnNode = std::make_unique<FloatLiteral>(token.location, std::stof(token.lexeme));
+    } else if (isMemory(true)) {
+        returnNode = parseMemoryName();
+        doAdvance = false; // parseMemoryName() already eats the token
+    } else {
+        parserPanic("invalid token " + token.lexeme, token.location);
     }
 
-    parserPanic("invalid token " + token.lexeme, token.location);
-    return std::unique_ptr<VoidLiteral>();
+    if (doAdvance)
+        advance();
+    return std::move(returnNode);
 }
 std::unique_ptr<IntegerLiteral> Parser::parseInteger() {
     bool negative = false;
@@ -424,4 +431,16 @@ casmlang::Token Parser::eat(TokenType type, const std::string& msg) {
 void Parser::parserPanic(const std::string& msg, const SourceLocation& src) {
     panic("[PARSER PANIC] " + msg + " [AT " + std::to_string(src.row) + ":" +
           std::to_string(src.column) + "]");
+}
+bool Parser::isMemory(bool allowVars) {
+    auto tkn = peek();
+    if (std::find(registers.begin(), registers.end(), tkn.lexeme) != registers.end()) {
+        return true;
+    }
+    if (tkn.type == TokenType::Identifier && allowVars) {
+        // assume the identifier is a variable
+        // let's just hope semantic analysis will catch it otherwise
+        return true;
+    }
+    return false;
 }

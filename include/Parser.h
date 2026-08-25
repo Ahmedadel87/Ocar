@@ -19,6 +19,7 @@ private:
     bool check(TokenType type);
     void advance(int offset = 1);
     void parserPanic(const std::string& msg, const SourceLocation& location = SourceLocation());
+    bool isMemory(bool allowVars = true);
 
     // clang-format off
     std::unique_ptr<Expression> parseExpression();
