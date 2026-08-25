@@ -106,10 +106,14 @@ void casmlang::IrGenerator::visit(ArithmeticOperation& node) {
     node.right->accept(*this);
     auto right = get_current_as<IrMemName>("expected right to be a memory name");
 
+    using BO = BinaryOperation;
     std::unique_ptr<IrOp> op;
     switch (node.operation) {
-        case BinaryOperation::ADD:
+        case BO::ADD:
             op = std::make_unique<IrAdd>(std::move(left), std::move(right));
+            break;
+        case BO::SUBTRACT:
+            op = std::make_unique<IrSub>(std::move(left), std::move(right));
             break;
         default:
             break;

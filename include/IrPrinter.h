@@ -25,6 +25,7 @@ private:
     void instr_print(IrCmp* ins, std::ostream& stream);
     void instr_print(IrSyscall* ins, std::ostream& stream);
     void instr_print(IrAdd* ins, std::ostream& stream);
+    void instr_print(IrSub* ins, std::ostream& stream);
 
     void instr_print(IrIntLit* ins, std::ostream& stream);
     void instr_print(IrMemName* ins, std::ostream& stream);

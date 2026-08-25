@@ -171,6 +171,20 @@ public:
         source->print(stream);
     }
 };
+class IrSub : public IrOp {
+public:
+    std::unique_ptr<IrMemName> destination;
+    std::unique_ptr<IrMemName> source;
+
+    IrSub(std::unique_ptr<IrMemName> destination_, std::unique_ptr<IrMemName> source_)
+        : destination(std::move(destination_)), source(std::move(source_)) {}
+
+    void print(std::ostream& stream) const override {
+        destination->print(stream);
+        stream << " -= ";
+        source->print(stream);
+    }
+};
 
 class IrGenerator : public Visitor {
 private:
