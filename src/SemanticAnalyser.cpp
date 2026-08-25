@@ -96,6 +96,20 @@ const Symbol* SemanticAnalyser::getSymbol(const std::string& identifier) const {
     }
     return nullptr;
 }
+const Symbol* SemanticAnalyser::getSymbolFromMemory(const std::string& memname) const {
+    Scope* scp = stack.back().get();
+    while (scp != nullptr) {
+        for (auto& pair : scp->symbols) {
+            if (pair.second->memoryName == memname) {
+                return pair.second.get();
+            }
+        }
+        if (scp->parent == nullptr)
+            break;
+        scp = scp->parent;
+    }
+    return nullptr;
+}
 void SemanticAnalyser::removeSymbol(const std::string& identifier) {
     Scope* scp = stack.back().get();
     while (scp != nullptr) {
@@ -106,39 +120,6 @@ void SemanticAnalyser::removeSymbol(const std::string& identifier) {
         scp = scp->parent;
     }
     semaPanic("Internal, cannot erase symbol \"" + identifier + "\"; it does not exist");
-}
-
-void SemanticAnalyser::push_active_memory(const std::string& memname, const std::string& varname) {
-    activeMemory.push_back(std::pair<std::string, std::string>(memname, varname));
-}
-void SemanticAnalyser::remove_active_memory(const std::string& varname) {
-    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
-                           [&](const auto& p) { return p.second == varname; });
-
-    if (it != activeMemory.end()) {
-        activeMemory.erase(it);
-    } else { // ehhh idk what to do here so let's just throw
-        semaPanic("internal, cannot remove variable \"" + varname +
-                  "\" from active memory; it does not exist");
-    }
-}
-std::string& SemanticAnalyser::find_in_active_memory(const std::string& memname) {
-    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
-                           [&](const auto& p) { return p.first == memname; });
-
-    if (it != activeMemory.end())
-        return it->second;
-    else
-        return emptystring;
-}
-std::string& SemanticAnalyser::find_memory_by_varname(const std::string& varname) {
-    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
-                           [&](const auto& p) { return p.second == varname; });
-
-    if (it != activeMemory.end())
-        return it->first;
-    else
-        return emptystring;
 }
 
 // == VISIT ==
@@ -186,7 +167,7 @@ void SemanticAnalyser::visit(VariableReference& node) {
         semaPanic("\"" + node.identifier + "\" is used as a variable even though it is a function",
                   node.location);
     }
-    std::string memname = find_memory_by_varname(node.identifier);
+    std::string memname = getSymbol(node.identifier)->memoryName;
     if (memname.empty()) {
         semaPanic("cannot refernce variable \"" + node.identifier +
                       "\" which is not assigned to any memory",
@@ -204,7 +185,7 @@ void SemanticAnalyser::visit(VariableReassignment& node) {
         semaPanic("\"" + node.identifier + "\" is used as a variable even though it is a function",
                   node.location);
     }
-    std::string memname = find_memory_by_varname(node.identifier);
+    std::string memname = getSymbol(node.identifier)->memoryName;
     if (memname.empty()) {
         semaPanic("Could not resolve memory name for identifier \"" + node.identifier + "\"",
                   node.location);
@@ -213,14 +194,13 @@ void SemanticAnalyser::visit(VariableReassignment& node) {
     node.value->accept(*this);
 }
 void SemanticAnalyser::visit(VariableDefinition& node) {
-    std::string& othervar = find_in_active_memory(node.memory);
-    if (!othervar.empty()) {
+    auto othermem = getSymbolFromMemory(node.memory);
+    if (othermem) {
         semaPanic("cannot reassign memory \"" + node.memory + "\" to \"" + node.identifier +
-                  "\"; it is already taken by \"" + othervar + "\"");
+                  "\"; it is already taken by \"" + othermem->identifier + "\"");
     }
     node.value->accept(*this);
-    push_active_memory(node.memory, node.identifier);
-    addSymbol(Symbol(node.identifier, SymbolKind::Variable));
+    addSymbol(Symbol(node.identifier, SymbolKind::Variable, 0, node.memory));
 }
 void SemanticAnalyser::visit(UnaryExpression& node) {
     node.value->accept(*this);
@@ -269,28 +249,16 @@ void SemanticAnalyser::visit(DeleteSymbol& node) {
 
     auto kind = getSymbol(node.identifier)->kind;
     removeSymbol(node.identifier);
-
-    if (kind != SymbolKind::Variable)
-        return; // if it's not a variable, it's not in active memory
-
-    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
-                           [&](const auto& p) { return p.second == node.identifier; });
-
-    if (it != activeMemory.end())
-        activeMemory.erase(it);
-    else
-        semaPanic("Internal, cannot erase memory \"" + it->first + "\" occupied by \"" +
-                  it->second + "\"");
 }
 void SemanticAnalyser::visit(FreeMemory& node) {
-    auto it = std::find_if(activeMemory.begin(), activeMemory.end(),
-                           [&](const auto& p) { return p.first == node.memoryName; });
+    auto symbol = getSymbolFromMemory(node.memoryName);
 
-    if (it != activeMemory.end()) {
-        removeSymbol(it->second);
-        activeMemory.erase(it);
-    } else
+    if (!symbol) {
         semaPanic("Cannot free memory \"" + node.memoryName + "\"; it is not occupied");
+        return;
+    }
+
+    removeSymbol(symbol->identifier);
 }
 void SemanticAnalyser::visit(IfStatement& node) {
     // the condition is an enum, nothing could possibly go wrong
@@ -311,7 +279,7 @@ void SemanticAnalyser::visit(Compare& node) {
                 semaPanic("can't compare symbol \"" + var->identifier + "\"; it is not a variable",
                           node.location);
 
-            child->name = find_memory_by_varname(var->identifier);
+            child->name = getSymbolFromMemory(var->identifier)->memoryName;
         } else if (auto reg = dynamic_cast<RegisterName*>(child)) {
             child->name = reg->name;
         }

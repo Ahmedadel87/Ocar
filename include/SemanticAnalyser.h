@@ -2,6 +2,7 @@
 #include "Common.h"
 #include <memory>
 #include <optional>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -11,10 +12,12 @@ enum class SymbolKind { Variable, Routine };
 struct Symbol {
     std::string identifier;
     SymbolKind kind;
+    std::string memoryName;
     int paramCount = 0;
 
-    Symbol(const std::string& identifier_, SymbolKind kind_, int paramCount_ = 0)
-        : identifier(identifier_), kind(kind_), paramCount(paramCount_) {}
+    Symbol(const std::string& identifier_, SymbolKind kind_, int paramCount_ = 0,
+           const std::string& memoryName_ = "")
+        : identifier(identifier_), kind(kind_), paramCount(paramCount_), memoryName(memoryName_) {}
 };
 
 class SemanticAnalyser : public Visitor {
@@ -27,7 +30,6 @@ class SemanticAnalyser : public Visitor {
         explicit Scope(Scope* parent_) : parent(parent_) {}
     };
     std::vector<uq<Scope>> stack;
-    std::vector<std::pair<std::string, std::string>> activeMemory; // mem name -> var name
 
     void enter_scope();
     void exit_scope();
@@ -35,13 +37,9 @@ class SemanticAnalyser : public Visitor {
     void removeSymbol(const std::string& identifier);
     void semaPanic(const std::string& msg, SourceLocation src = SourceLocation());
 
-    void push_active_memory(const std::string& memname, const std::string& varname);
-    void remove_active_memory(const std::string& varname);
-    std::string& find_memory_by_varname(const std::string& varname);
-    std::string& find_in_active_memory(const std::string& memname);
-
     bool symbolExists(const std::string& identifier) const;
     const Symbol* getSymbol(const std::string& identifier) const;
+    const Symbol* getSymbolFromMemory(const std::string& memName) const;
 
     ExpressionInfo analyseExpression(Expression* expr);
 
