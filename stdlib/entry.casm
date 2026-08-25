@@ -1,4 +1,0 @@
-rtn _start();
-sect text() {
-    global _start();
-}
