@@ -25,7 +25,7 @@ void Tokenizer::prcs_process() {
 }
 
 void Tokenizer::prcs_process_include() {
-    fs::path stdlib = CASMLANG_STDLIB_PATH;
+    fs::path stdlib = OCAR_STDLIB_PATH;
 
     std::string arg;
     while (!eof() && current() != '\n') {
@@ -40,17 +40,17 @@ void Tokenizer::prcs_process_include() {
     while (!arg.empty() && std::isspace(ucharcast(arg.back())))
         arg.pop_back();
 
-    fs::path linkfile = stdlib / (arg + ".casm");
+    fs::path linkfile = stdlib / (arg + ".ocar");
 
     if (!fs::exists(linkfile)) {
-        panic("Preprocessor: couldn't find file \"" + arg + ".casm\" in standard library at line " +
+        panic("Preprocessor: couldn't find file \"" + arg + ".ocar\" in standard library at line " +
               std::to_string(row));
     }
 
     std::ifstream file(linkfile);
     if (!file) {
         panic("Preprocessor: Found file \"" + arg +
-              ".casm\" in standard library but couldn't open it; check permissions");
+              ".ocar\" in standard library but couldn't open it; check permissions");
     }
 
     // read the included file.

@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Debug)
-project(CasmLang VERSION 0.1.0 LANGUAGES CXX)
+project(Ocar VERSION 0.1.0 LANGUAGES CXX)
 
-add_executable(CasmLang
+add_executable(Ocar
         src/main.cpp
-        src/CasmLang.cpp
+        src/Ocar.cpp
         src/Tokenizer.cpp
         src/Parser.cpp
         src/Visitor.cpp
@@ -14,11 +14,11 @@ add_executable(CasmLang
         src/IrPrinter.cpp
         src/Preprocessor.cpp
 )
-target_include_directories(CasmLang
+target_include_directories(Ocar
     PRIVATE
         ${CMAKE_SOURCE_DIR}/include
 )
-target_compile_features(CasmLang PRIVATE cxx_std_20)
-target_compile_definitions(CasmLang PRIVATE
-    CASMLANG_STDLIB_PATH="${CMAKE_SOURCE_DIR}/stdlib"
+target_compile_features(Ocar PRIVATE cxx_std_20)
+target_compile_definitions(Ocar PRIVATE
+    OCAR_STDLIB_PATH="${CMAKE_SOURCE_DIR}/stdlib"
 )

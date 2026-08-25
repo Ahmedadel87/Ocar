@@ -54,5 +54,5 @@ Thumbs.db
 .cache/*
 
 # Code files
-main.casm
+main.ocar
 out.asm
