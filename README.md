@@ -27,8 +27,8 @@ rtn _start() noret {
 }
 ```
 ### Explanation
-1) `#stdlib entry` includes `entry.casm` from the standard library, which defines `_start()` as the entry point.
-2) `#stdlib exit` includes `exit.casm` from the standard library, which allows `exit()` to exit the program with exit code 0.
+1) `#stdlib entry` includes `entry.ocar` from the standard library, which defines `_start()` as the entry point.
+2) `#stdlib exit` includes `exit.ocar` from the standard library, which allows `exit()` to exit the program with exit code 0.
 3) `rtn` means routine. It is the language's version of a function. 
 4) `rtn _start()` defines a routine called `_start()`. `noret` makes it that the transpiler doesn't add a `ret` at the end of the function, which is not needed for the entry point.
 5) `rbx myVar1 = 3;` and `rcx myVar2 = 5;` define two variables that take up the registers `rbx` and `rcx` respectively. Note that the user manually declares which registers they should take. If any other variable tries to claim those registers without the registers being freed first, the compiler will throw.
