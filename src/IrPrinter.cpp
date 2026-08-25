@@ -49,7 +49,6 @@ void IrPrinter::instr_print(IrMovStmt* ins, std::ostream& stream) {
 }
 void IrPrinter::instr_print(IrLabelStmt* ins, std::ostream& stream) {
     stream << ins->labeltext << ":";
-    indent++;
 }
 void IrPrinter::instr_print(IrRetStmt* ins, std::ostream& stream) {
     print_indent(stream);
