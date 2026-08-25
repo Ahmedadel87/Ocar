@@ -151,9 +151,8 @@ std::unique_ptr<SectionDefinition> Parser::parseSectionDefinition() {
     std::string identifier = eat(TokenType::Identifier, "expected section identifier").lexeme;
     eat(TokenType::LParen, "expected '(' after identifier for section definition");
     eat(TokenType::RParen, "expected ')' after identifier for section definition");
-    auto scope = parseScope(true);
 
-    return std::make_unique<SectionDefinition>(identifier, std::move(scope));
+    return std::make_unique<SectionDefinition>(identifier);
 }
 std::unique_ptr<Global> Parser::parseGlobal() {
     auto tkn = eat(TokenType::KeywordGlobal, "expected keyword 'global' for global definition");

@@ -283,12 +283,10 @@ public:
 class SectionDefinition : public Statement {
 public:
     std::string identifier;
-    std::unique_ptr<ScopeBlock> scope;
 
     void accept(Visitor& visitor) override;
 
-    SectionDefinition(const std::string& identifier_, std::unique_ptr<ScopeBlock> scope_ = nullptr)
-        : identifier(identifier_), scope(std::move(scope_)) {}
+    SectionDefinition(const std::string& identifier_) : identifier(identifier_) {}
 };
 class Global : public Statement {
 public:

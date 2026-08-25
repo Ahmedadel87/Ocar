@@ -115,9 +115,6 @@ void PrettyPrinter::visit(RoutineDefinition& node) {
 void PrettyPrinter::visit(SectionDefinition& node) {
     printIndent();
     stream << "SectionDefinition " << node.identifier << "\n";
-    indent++;
-    node.scope->accept(*this);
-    indent--;
 }
 void PrettyPrinter::visit(Global& node) {
     printIndent();
