@@ -157,3 +157,7 @@ void PrettyPrinter::visit(RegisterName& node) {
     printIndent();
     stream << "(reg)" << node.name;
 }
+void PrettyPrinter::visit(SyscallStatement& node) {
+    printIndent();
+    stream << "syscall";
+}

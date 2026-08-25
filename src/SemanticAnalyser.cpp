@@ -292,3 +292,4 @@ void SemanticAnalyser::visit(RegisterName& node) {
         semaPanic("invalid register name \"" + node.name + "\"", node.location);
     }
 }
+void SemanticAnalyser::visit(SyscallStatement& node) {}

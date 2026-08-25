@@ -38,6 +38,7 @@ enum class TokenType {
     KeywordIf,
     KeywordCompareCond,
     KeywordCompare,
+    KeywordSyscall,
 
     EndOfFile
 };
@@ -71,6 +72,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"free", TokenType::KeywordFree},
      {"if", TokenType::KeywordIf},
      {"compare", TokenType::KeywordCompare},
+     {"syscall", TokenType::KeywordSyscall},
 
      {"greater", TokenType::KeywordCompareCond},
      {"greater_equal", TokenType::KeywordCompareCond},
@@ -123,8 +125,8 @@ const std::array<std::string, 16> registers = {{
     "rdx",
     "rsi",
     "rdi",
-    "rbp",
-    "rsp",
+    "rbp", // base pointer
+    "rsp", // stack pointer
     "r8",
     "r9",
     "r10",
@@ -345,6 +347,12 @@ public:
             std::unique_ptr<MemoryName> right_)
         : Statement(lct), left(std::move(left_)), right(std::move(right_)) {}
 };
+class SyscallStatement : public Statement {
+public:
+    void accept(Visitor& visitor) override;
+
+    SyscallStatement(const SourceLocation& lct) : Statement(lct) {}
+};
 
 class Literal : public Expression {
 public:
@@ -415,6 +423,7 @@ public:
     virtual void visit(FreeMemory& node) = 0;
     virtual void visit(IfStatement& node) = 0;
     virtual void visit(Compare& node) = 0;
+    virtual void visit(SyscallStatement& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -448,6 +457,7 @@ public:
     void visit(IfStatement& node) override;
     void visit(Compare& node) override;
     void visit(RegisterName& node) override;
+    void visit(SyscallStatement& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -517,5 +527,8 @@ inline void Compare::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void RegisterName::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void SyscallStatement::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

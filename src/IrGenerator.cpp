@@ -96,3 +96,6 @@ void casmlang::IrGenerator::visit(Compare& node) {
 void casmlang::IrGenerator::visit(RegisterName& node) {
     currentNode = std::make_unique<IrMemName>(node.name);
 }
+void casmlang::IrGenerator::visit(SyscallStatement& node) {
+    ir.push_back(std::make_unique<IrSyscall>());
+}

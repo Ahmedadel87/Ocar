@@ -69,6 +69,7 @@ public:
     void visit(IfStatement& node) override;
     void visit(Compare& node) override;
     void visit(RegisterName& node) override;
+    void visit(SyscallStatement& node) override;
 
     std::unique_ptr<ScopeBlock> hand_over_AST();
     void load_ast(uq<ScopeBlock> ast_);

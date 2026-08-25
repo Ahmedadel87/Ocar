@@ -71,6 +71,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseIfStatement();
     else if (check(TokenType::KeywordCompare))
         return parseCompareStatement();
+    else if (check(TokenType::KeywordSyscall))
+        return parseSyscall();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -251,6 +253,10 @@ std::unique_ptr<Compare> Parser::parseCompareStatement() {
     eat(TokenType::Comma, "expected comma after first memory name in 'compare' statement");
     auto right = parseMemoryName();
     return std::make_unique<Compare>(tkn.location, std::move(left), std::move(right));
+}
+std::unique_ptr<SyscallStatement> Parser::parseSyscall() {
+    auto tkn = eat(TokenType::KeywordSyscall, "expected keyword 'syscall' for syscall statement");
+    return std::make_unique<SyscallStatement>(tkn.location);
 }
 
 // == EXPRESSION PARSERS ==

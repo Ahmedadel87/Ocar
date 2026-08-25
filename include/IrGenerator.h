@@ -145,6 +145,13 @@ public:
         stream << "cmp " << left << ", " << right;
     }
 };
+class IrSyscall : public IrStmt {
+public:
+    IrSyscall() = default;
+    void print(std::ostream& stream) const override {
+        stream << "syscall";
+    }
+};
 
 class IrGenerator : public Visitor {
 private:
@@ -203,6 +210,7 @@ public:
     void visit(FreeMemory& node) override;
     void visit(IfStatement& node) override;
     void visit(Compare& node) override;
+    void visit(SyscallStatement& node) override;
 };
 
 } // namespace casmlang

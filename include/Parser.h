@@ -44,6 +44,7 @@ private:
     std::unique_ptr<IfStatement> parseIfStatement();
     std::unique_ptr<Compare> parseCompareStatement();
     std::unique_ptr<Global> parseGlobal();
+    std::unique_ptr<SyscallStatement> parseSyscall();
     std::unique_ptr<RoutineDefinition> parseRoutineDefinition();
     std::unique_ptr<RoutineDeclaration> parseRoutineDeclaration();
     std::unique_ptr<SectionDefinition> parseSectionDefinition();
