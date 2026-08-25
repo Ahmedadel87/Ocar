@@ -3,9 +3,9 @@ Ocar is a low-level Assembly transpiler (not a compiler!). With its C-inspired s
 ## Now with syntax highlighting!
 A previous commit added a VSCode syntax highlighter. To use, run:
 ```bash
-code --install-extension casmlang-0.0.3-vsix
+code --install-extension ocarlang-0.0.4.vsix
 ```
-Then press `Ctrl+Shift+P` and type `Developer: Reload Window` and press enter. Then, after creating a `.casm` file, you *should* be able to see it syntax highlighted!
+Then press `Ctrl+Shift+P` and type `Developer: Reload Window` and press enter. Then, after creating a `.ocar` file, you *should* be able to see it syntax highlighted!
 ## Why is it a transpiler and not a compiler?
 Technically, it _is_ indeed a compiler. However, because it doesn't provide many features compilers are known to provide (mainly register allocation and recursive expressions), I choose to call it a transpiler because the information for every instruction is pretty much self-contained.
 ## Syntax example
