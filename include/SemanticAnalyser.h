@@ -13,11 +13,13 @@ struct Symbol {
     std::string identifier;
     SymbolKind kind;
     std::string memoryName;
+    Statement* source;
     int paramCount = 0;
 
     Symbol(const std::string& identifier_, SymbolKind kind_, int paramCount_ = 0,
-           const std::string& memoryName_ = "")
-        : identifier(identifier_), kind(kind_), paramCount(paramCount_), memoryName(memoryName_) {}
+           const std::string& memoryName_ = "", Statement* source_ = nullptr)
+        : identifier(identifier_), kind(kind_), paramCount(paramCount_), memoryName(memoryName_),
+          source(source_) {}
 };
 
 class SemanticAnalyser : public Visitor {

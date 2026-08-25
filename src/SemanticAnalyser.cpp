@@ -200,7 +200,7 @@ void SemanticAnalyser::visit(VariableDefinition& node) {
                   "\"; it is already taken by \"" + othermem->identifier + "\"");
     }
     node.value->accept(*this);
-    addSymbol(Symbol(node.identifier, SymbolKind::Variable, 0, node.memory));
+    addSymbol(Symbol(node.identifier, SymbolKind::Variable, 0, node.memory, &node));
 }
 void SemanticAnalyser::visit(UnaryExpression& node) {
     node.value->accept(*this);
@@ -210,25 +210,27 @@ void SemanticAnalyser::visit(RoutineCallStmt& node) {
         semaPanic("cannot reference function \"" + node.identifier + "\"; it does not exist.",
                   node.location);
     }
-    if (getSymbol(node.identifier)->kind != SymbolKind::Routine) {
+    auto symbol = getSymbol(node.identifier);
+    if (symbol->kind != SymbolKind::Routine) {
         semaPanic("\"" + node.identifier + "\" is used as a function even though it is a variable",
                   node.location);
     }
 
-    auto paramCount = getSymbol(node.identifier)->paramCount;
+    auto paramCount = symbol->paramCount;
     if (node.args.size() < paramCount) {
         semaPanic("less arguments than requested");
     }
     if (node.args.size() > paramCount) {
         semaPanic("more arguments than requested");
     }
+    symbol->source->accept(*this);
 }
 void SemanticAnalyser::visit(RoutineDefinition& node) {
-    addSymbol(Symbol(node.identifier, SymbolKind::Routine));
+    addSymbol(Symbol(node.identifier, SymbolKind::Routine, 0, "", &node));
     node.scope->accept(*this);
 }
 void SemanticAnalyser::visit(SectionDefinition& node) {
-    addSymbol(Symbol(node.identifier, SymbolKind::Routine));
+    addSymbol(Symbol(node.identifier, SymbolKind::Routine, 0, "", &node));
 }
 void SemanticAnalyser::visit(Global& node) {
     if (!symbolExists(node.identifier))
@@ -240,7 +242,7 @@ void SemanticAnalyser::visit(Global& node) {
     }
 }
 void SemanticAnalyser::visit(RoutineDeclaration& node) {
-    addSymbol(Symbol(node.identifier, SymbolKind::Routine));
+    addSymbol(Symbol(node.identifier, SymbolKind::Routine, 0, "", &node));
 }
 void SemanticAnalyser::visit(AsmInstruction& node) {}
 void SemanticAnalyser::visit(DeleteSymbol& node) {
