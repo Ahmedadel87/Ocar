@@ -23,9 +23,14 @@ std::unique_ptr<ScopeBlock> Parser::parseScope(bool require_brackets) {
         eat(TokenType::LBrace, "expected '{' on scope entry");
 
     while (!isEnd()) {
-        auto stmt = parseStatement();
-        if (stmt != nullptr) {
-            scope->children.push_back(std::move(stmt));
+        std::unique_ptr<ASTNode> node;
+        if (check(TokenType::LBrace)) {
+            node = parseScope(true); // arbitrary scoping
+        } else {
+            node = parseStatement();
+        }
+        if (node != nullptr) {
+            scope->children.push_back(std::move(node));
         }
 
         if (match(TokenType::EndOfFile))
