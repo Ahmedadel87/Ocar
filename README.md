@@ -47,6 +47,8 @@ rtn _start() noret {
   - [x] Comparisons
   - [ ] Else statements
 - [ ] Goto and labels
+- [ ] While loops
+- [ ] For loops
 - [ ] Add linking. Probably C-style, because it's easier.
   - [ ] Make a standard library
 - [ ] `#noheader` option that removes the autogeneration header
