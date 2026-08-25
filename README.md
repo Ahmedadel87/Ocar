@@ -1,5 +1,5 @@
-# CasmLang
-CasmLang is a low-level Assembly transpiler (not a compiler!). With its C-inspired syntax, it aims to provide a more visually appealing way of writing raw assembly.
+# Ocar
+Ocar is a low-level Assembly transpiler (not a compiler!). With its C-inspired syntax, it aims to provide a more visually appealing way of writing raw assembly.
 ## Now with syntax highlighting!
 A previous commit added a VSCode syntax highlighter. To use, run:
 ```bash
@@ -53,3 +53,6 @@ rtn _start() noret {
 - [ ] Stack memory acces (e.g. `stk[bytecount] varname = 0;`, `stk[8] myint = 17;`)
 - [ ] Function parameters/arguments
   - Maybe give an optional `autopush` keyword that finds free spots in the stack and pushes the registers used by parameters into them, then loads them on exit, so users don't have to worry about register data disappearing.
+
+## Name
+Ocar's name is a recursive acronym stnding for OCAR Can't Allocate Registers.
