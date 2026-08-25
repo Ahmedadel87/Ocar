@@ -297,3 +297,7 @@ void SemanticAnalyser::visit(ArithmeticOperation& node) {
     node.left->accept(*this);
     node.right->accept(*this);
 }
+void SemanticAnalyser::visit(RawAssignment& node) {
+    node.left->accept(*this);
+    node.right->accept(*this);
+}

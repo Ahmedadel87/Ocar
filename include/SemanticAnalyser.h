@@ -71,6 +71,7 @@ public:
     void visit(RegisterName& node) override;
     void visit(SyscallStatement& node) override;
     void visit(ArithmeticOperation& node) override;
+    void visit(RawAssignment& node) override;
 
     std::unique_ptr<ScopeBlock> hand_over_AST();
     void load_ast(uq<ScopeBlock> ast_);

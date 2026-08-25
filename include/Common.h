@@ -41,6 +41,7 @@ enum class TokenType {
     KeywordCompare,
     KeywordSyscall,
     KeywordArithmeticOperation,
+    KeywordRaw,
 
     EndOfFile
 };
@@ -75,6 +76,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"if", TokenType::KeywordIf},
      {"compare", TokenType::KeywordCompare},
      {"syscall", TokenType::KeywordSyscall},
+     {"raw", TokenType::KeywordRaw},
 
      {"greater", TokenType::KeywordCompareCond},
      {"greater_equal", TokenType::KeywordCompareCond},
@@ -371,6 +373,16 @@ public:
         : Statement(lct), left(std::move(left_)), operation(op), right(std::move(right_)) {}
     void accept(Visitor& visitor) override;
 };
+class RawAssignment : public Statement {
+public:
+    std::unique_ptr<MemoryName> left;
+    std::unique_ptr<Expression> right;
+
+    RawAssignment(const SourceLocation& lct, std::unique_ptr<MemoryName> left_,
+                  std::unique_ptr<Expression> right_)
+        : Statement(lct), left(std::move(left_)), right(std::move(right_)) {}
+    void accept(Visitor& visitor) override;
+};
 
 class Literal : public Expression {
 public:
@@ -443,6 +455,7 @@ public:
     virtual void visit(Compare& node) = 0;
     virtual void visit(SyscallStatement& node) = 0;
     virtual void visit(ArithmeticOperation& node) = 0;
+    virtual void visit(RawAssignment& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -478,6 +491,7 @@ public:
     void visit(RegisterName& node) override;
     void visit(SyscallStatement& node) override;
     void visit(ArithmeticOperation& node) override;
+    void visit(RawAssignment& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -553,5 +567,8 @@ inline void SyscallStatement::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void ArithmeticOperation::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void RawAssignment::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

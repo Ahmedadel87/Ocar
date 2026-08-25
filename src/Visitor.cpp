@@ -174,3 +174,9 @@ void PrettyPrinter::visit(ArithmeticOperation& node) {
     node.right->accept(*this);
     indent--;
 }
+void PrettyPrinter::visit(RawAssignment& node) {
+    stream << "raw assignment: ";
+    node.left->accept(*this);
+    stream << " = ";
+    node.right->accept(*this);
+}

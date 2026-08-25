@@ -43,6 +43,7 @@ std::unique_ptr<ScopeBlock> Parser::parseScope(bool require_brackets) {
 
 // == PARSE FUNCTIONS ==
 std::unique_ptr<Statement> Parser::parseStatement() {
+    // TODO: change this to a switch statement
     if (match(TokenType::Semicolon))
         return nullptr;
     else if (check(TokenType::KeywordRegister))
@@ -75,6 +76,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseCompareStatement();
     else if (check(TokenType::KeywordSyscall))
         return parseSyscall();
+    else if (check(TokenType::KeywordRaw))
+        return parseRawAssignment();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -294,6 +297,15 @@ std::unique_ptr<ArithmeticOperation> Parser::parseArithmeticOperation() {
     auto right_node = std::make_unique<VariableReference>(right.location, right.lexeme);
     return std::make_unique<ArithmeticOperation>(left.location, std::move(left_node), op_enum,
                                                  std::move(right_node));
+}
+std::unique_ptr<RawAssignment> Parser::parseRawAssignment() {
+    auto tkn = eat(TokenType::KeywordRaw, "expected keyword 'raw' for raw assignment");
+
+    auto mem = parseMemoryName();
+    eat(TokenType::EqualSign, "expected equal sign after memory name in raw assignment");
+    auto right = parseExpression();
+    eat(TokenType::Semicolon, "expected semicolon after raw assignment");
+    return std::make_unique<RawAssignment>(tkn.location, std::move(mem), std::move(right));
 }
 
 // == EXPRESSION PARSERS ==

@@ -120,3 +120,12 @@ void casmlang::IrGenerator::visit(ArithmeticOperation& node) {
     }
     ir.push_back(std::move(op));
 }
+void casmlang::IrGenerator::visit(RawAssignment& node) {
+    node.left->accept(*this);
+    auto leftName = get_current_as<IrMemName>()->name;
+
+    node.right->accept(*this);
+    auto right = get_current_as<IrExpr>();
+
+    ir.push_back(std::make_unique<IrMovStmt>(leftName, std::move(right)));
+}
