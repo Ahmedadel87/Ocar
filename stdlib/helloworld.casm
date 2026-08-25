@@ -1,7 +1,7 @@
 rtn hello_world() {
-    @jmp __after
+    @jmp __STDLIB_LABEL__helloworld_after
     @msg db "Hello, world!", 10, 0ah
-    @__after:
+    @__STDLIB_LABEL__helloworld_after:
     @mov rax, 1
     @mov rdi, 1
     @mov rsi, msg
