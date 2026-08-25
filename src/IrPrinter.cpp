@@ -48,8 +48,6 @@ void IrPrinter::instr_print(IrMovStmt* ins, std::ostream& stream) {
     dispatch_print(ins->value.get(), stream);
 }
 void IrPrinter::instr_print(IrLabelStmt* ins, std::ostream& stream) {
-    indent = 0;
-    print_indent(stream);
     stream << ins->labeltext << ":";
     indent++;
 }
@@ -61,13 +59,14 @@ void IrPrinter::instr_print(IrRetStmt* ins, std::ostream& stream) {
 void IrPrinter::instr_print(IrRtnCall* ins, std::ostream& stream) {
     print_indent(stream);
     stream << "call " << ins->rtnname;
+    indent--;
 }
 void IrPrinter::instr_print(IrGlobal* ins, std::ostream& stream) {
     print_indent(stream);
     stream << "global " << ins->identifier;
 }
 void IrPrinter::instr_print(IrSection* ins, std::ostream& stream) {
-    print_indent(stream);
+    indent = 0;
     stream << "section ." << ins->text;
     indent++;
 }
