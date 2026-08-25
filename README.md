@@ -45,7 +45,7 @@ The `@` prefix means that those instructions will translate literally to assembl
 - [x] Variable support for assignment (allow `rax a = b;`)
 - [ ] Four operations
 - [x] If statements
-  - [ ] Comparisons
+  - [x] Comparisons
   - [ ] Else statements
 - [ ] Goto and labels
 - [ ] Add linking. Probably C-style, because it's easier.
