@@ -205,7 +205,11 @@ std::unique_ptr<DeleteSymbol> Parser::parseDeleteVar() {
 }
 std::unique_ptr<FreeMemory> Parser::parseFreeMemory() {
     auto tkn = eat(TokenType::KeywordFree, "expected keyword 'free' for free statement");
-    auto memname = parseMemoryName()->name;
+    auto mem = parseMemoryName();
+    if (auto varref = dynamic_cast<VariableReference*>(mem.get()))
+        parserPanic("cannot free variable reference to \"" + varref->identifier +
+                    "\"; consider using 'delete'");
+    auto memname = mem->name;
     eat(TokenType::Semicolon, "expected semicolon afted free statement");
 
     return std::make_unique<FreeMemory>(memname);
