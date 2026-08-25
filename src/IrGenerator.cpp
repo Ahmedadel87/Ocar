@@ -99,3 +99,24 @@ void casmlang::IrGenerator::visit(RegisterName& node) {
 void casmlang::IrGenerator::visit(SyscallStatement& node) {
     ir.push_back(std::make_unique<IrSyscall>());
 }
+void casmlang::IrGenerator::visit(ArithmeticOperation& node) {
+    node.left->accept(*this);
+    auto left = get_current_as<IrMemName>("expected left to be a memory name");
+
+    node.right->accept(*this);
+    auto right = get_current_as<IrMemName>("expected right to be a memory name");
+
+    std::unique_ptr<IrOp> op;
+    switch (node.operation) {
+        case BinaryOperation::ADD:
+            op = std::make_unique<IrAdd>(std::move(left), std::move(right));
+            break;
+        default:
+            break;
+    }
+    if (!op) {
+        panic("Invalid binary operation at " + std::to_string(node.location.row) + ":" +
+              std::to_string(node.location.column));
+    }
+    ir.push_back(std::move(op));
+}

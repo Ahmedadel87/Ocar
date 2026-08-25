@@ -161,3 +161,16 @@ void PrettyPrinter::visit(SyscallStatement& node) {
     printIndent();
     stream << "syscall";
 }
+void PrettyPrinter::visit(ArithmeticOperation& node) {
+    printIndent();
+    stream << "ArithmeticOperation";
+
+    indent++;
+    node.left->accept(*this);
+
+    printIndent();
+    stream << (int)node.operation;
+
+    node.right->accept(*this);
+    indent--;
+}

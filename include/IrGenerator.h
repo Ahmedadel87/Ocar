@@ -152,6 +152,25 @@ public:
         stream << "syscall";
     }
 };
+class IrOp : public IrStmt {
+public:
+    virtual ~IrOp() = default;
+    virtual void print(std::ostream& stream) const = 0;
+};
+class IrAdd : public IrOp {
+public:
+    std::unique_ptr<IrMemName> destination;
+    std::unique_ptr<IrMemName> source;
+
+    IrAdd(std::unique_ptr<IrMemName> destination_, std::unique_ptr<IrMemName> source_)
+        : destination(std::move(destination_)), source(std::move(source_)) {}
+
+    void print(std::ostream& stream) const override {
+        destination->print(stream);
+        stream << " += ";
+        source->print(stream);
+    }
+};
 
 class IrGenerator : public Visitor {
 private:
@@ -211,6 +230,7 @@ public:
     void visit(IfStatement& node) override;
     void visit(Compare& node) override;
     void visit(SyscallStatement& node) override;
+    void visit(ArithmeticOperation& node) override;
 };
 
 } // namespace casmlang

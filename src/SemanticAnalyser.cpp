@@ -293,3 +293,7 @@ void SemanticAnalyser::visit(RegisterName& node) {
     }
 }
 void SemanticAnalyser::visit(SyscallStatement& node) {}
+void SemanticAnalyser::visit(ArithmeticOperation& node) {
+    node.left->accept(*this);
+    node.right->accept(*this);
+}

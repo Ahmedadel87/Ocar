@@ -27,6 +27,7 @@ enum class TokenType {
     EqualSign,
     Minus,
     SnailSign,
+    ArithmeticAssign,
 
     KeywordRegister,
     KeywordRoutine,
@@ -39,6 +40,7 @@ enum class TokenType {
     KeywordCompareCond,
     KeywordCompare,
     KeywordSyscall,
+    KeywordArithmeticOperation,
 
     EndOfFile
 };
@@ -100,6 +102,11 @@ const std::unordered_map<std::string, TokenType> word_table{
 
      {"true", TokenType::BoolLiteral},
      {"false", TokenType::BoolLiteral},
+
+     {"+=", TokenType::ArithmeticAssign},
+     {"-=", TokenType::ArithmeticAssign},
+     {"*=", TokenType::ArithmeticAssign},
+     {"/=", TokenType::ArithmeticAssign},
 
      {"__END_OF_FILE__", TokenType::EndOfFile},
      {"(", TokenType::LParen},
@@ -353,6 +360,17 @@ public:
 
     SyscallStatement(const SourceLocation& lct) : Statement(lct) {}
 };
+class ArithmeticOperation : public Statement {
+public:
+    std::unique_ptr<MemoryName> left;
+    BinaryOperation operation;
+    std::unique_ptr<MemoryName> right;
+
+    ArithmeticOperation(const SourceLocation& lct, std::unique_ptr<MemoryName> left_,
+                        BinaryOperation op, std::unique_ptr<MemoryName> right_)
+        : Statement(lct), left(std::move(left_)), operation(op), right(std::move(right_)) {}
+    void accept(Visitor& visitor) override;
+};
 
 class Literal : public Expression {
 public:
@@ -424,6 +442,7 @@ public:
     virtual void visit(IfStatement& node) = 0;
     virtual void visit(Compare& node) = 0;
     virtual void visit(SyscallStatement& node) = 0;
+    virtual void visit(ArithmeticOperation& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -458,6 +477,7 @@ public:
     void visit(Compare& node) override;
     void visit(RegisterName& node) override;
     void visit(SyscallStatement& node) override;
+    void visit(ArithmeticOperation& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -530,5 +550,8 @@ inline void RegisterName::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void SyscallStatement::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void ArithmeticOperation::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

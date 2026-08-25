@@ -50,6 +50,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
     else if (check(TokenType::Identifier)) {
         if (peek(1).type == TokenType::LParen)
             return parseRoutineCallStmt();
+        if (peek(1).type == TokenType::ArithmeticAssign)
+            return parseArithmeticOperation();
         return parseVariableReassignment();
     } else if (check(TokenType::KeywordRoutine)) {
         if (peek(4).type == TokenType::Semicolon)
@@ -261,6 +263,37 @@ std::unique_ptr<Compare> Parser::parseCompareStatement() {
 std::unique_ptr<SyscallStatement> Parser::parseSyscall() {
     auto tkn = eat(TokenType::KeywordSyscall, "expected keyword 'syscall' for syscall statement");
     return std::make_unique<SyscallStatement>(tkn.location);
+}
+std::unique_ptr<ArithmeticOperation> Parser::parseArithmeticOperation() {
+    auto left = eat(TokenType::Identifier, "expected identifier on the left");
+    auto op = eat(TokenType::ArithmeticAssign,
+                  "expected arithmetic assignment operator for arithmetic operation")
+                  .lexeme;
+    auto right = eat(TokenType::Identifier, "expected identifier on the right");
+
+    using BO = BinaryOperation;
+    BO op_enum;
+    switch (op.at(0)) {
+        case '+':
+            op_enum = BO::ADD;
+            break;
+        case '-':
+            op_enum = BO::SUBTRACT;
+            break;
+        case '*':
+            op_enum = BO::MULTIPLY;
+            break;
+        case '/':
+            op_enum = BO::DIVIDE;
+            break;
+        default:
+            break;
+    }
+
+    auto left_node = std::make_unique<VariableReference>(left.location, left.lexeme);
+    auto right_node = std::make_unique<VariableReference>(right.location, right.lexeme);
+    return std::make_unique<ArithmeticOperation>(left.location, std::move(left_node), op_enum,
+                                                 std::move(right_node));
 }
 
 // == EXPRESSION PARSERS ==
