@@ -40,7 +40,7 @@ rtn _start() noret {
 - [x] Add register freeing (e.g. `free rax`, `free rdi`)
 - [x] Add multiline comments
 - [x] Add `syscall` operation
-- [ ] Raw register access (e.g. `raw rax = 5`)
+- [x] Raw register access (e.g. `raw rax = 5`)
 - [x] Variable support for assignment (allow `rax a = b;`)
 - [ ] Four operations
 - [x] If statements
