@@ -51,7 +51,7 @@ rtn _start() noret {
 - [ ] For loops
 - [ ] Add linking. Probably C-style, because it's easier.
   - [ ] Make a standard library
-- [ ] `#noheader` option that removes the autogeneration header
+- [x] `#noheader` option that removes the autogeneration header
 - [ ] Stack memory acces (e.g. `stk[bytecount] varname = 0;`, `stk[8] myint = 17;`)
 - [ ] Function parameters/arguments
   - Maybe give an optional `autopush` keyword that finds free spots in the stack and pushes the registers used by parameters into them, then loads them on exit, so users don't have to worry about register data disappearing.
