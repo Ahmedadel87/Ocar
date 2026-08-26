@@ -301,3 +301,12 @@ void SemanticAnalyser::visit(RawAssignment& node) {
     node.left->accept(*this);
     node.right->accept(*this);
 }
+void SemanticAnalyser::visit(RawLabel& node) {
+    auto symbol = getSymbol(node.labelname);
+    if (symbol)
+        semaPanic("cannot defined label \"" + node.labelname +
+                  "\"; another symbol with the same name is already declared, and labels do not "
+                  "support shadowing");
+
+    addSymbol(Symbol(node.labelname, SymbolKind::Label, 0, "", &node));
+}

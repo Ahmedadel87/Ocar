@@ -133,3 +133,6 @@ void casmlang::IrGenerator::visit(RawAssignment& node) {
 
     ir.push_back(std::make_unique<IrMovStmt>(leftName, std::move(right)));
 }
+void casmlang::IrGenerator::visit(RawLabel& node) {
+    ir.push_back(std::make_unique<IrLabelStmt>(node.labelname));
+}

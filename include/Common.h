@@ -24,6 +24,7 @@ enum class TokenType {
     RBrace,
     Comma,
     Semicolon,
+    Colon,
     EqualSign,
     Minus,
     SnailSign,
@@ -115,6 +116,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {")", TokenType::RParen},
      {"{", TokenType::LBrace},
      {"}", TokenType::RBrace},
+     {":", TokenType::Colon},
      {";", TokenType::Semicolon},
      {"-", TokenType::Minus},
      {",", TokenType::Comma},
@@ -425,6 +427,14 @@ public:
         : Statement(lct), left(std::move(left_)), right(std::move(right_)) {}
     void accept(Visitor& visitor) override;
 };
+class RawLabel : public Statement {
+public:
+    std::string labelname;
+
+    RawLabel(const SourceLocation& lct, const std::string& labelname_)
+        : Statement(lct), labelname(labelname_) {}
+    void accept(Visitor& visitor) override;
+};
 
 class Visitor {
 public:
@@ -456,6 +466,7 @@ public:
     virtual void visit(SyscallStatement& node) = 0;
     virtual void visit(ArithmeticOperation& node) = 0;
     virtual void visit(RawAssignment& node) = 0;
+    virtual void visit(RawLabel& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -492,6 +503,7 @@ public:
     void visit(SyscallStatement& node) override;
     void visit(ArithmeticOperation& node) override;
     void visit(RawAssignment& node) override;
+    void visit(RawLabel& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -570,5 +582,8 @@ inline void ArithmeticOperation::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void RawAssignment::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void RawLabel::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

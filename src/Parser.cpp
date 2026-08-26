@@ -53,6 +53,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
             return parseRoutineCallStmt();
         if (peek(1).type == TokenType::ArithmeticAssign)
             return parseArithmeticOperation();
+        if (peek(1).type == TokenType::Colon)
+            return parseRawLabel();
         return parseVariableReassignment();
     } else if (check(TokenType::KeywordRoutine)) {
         if (peek(4).type == TokenType::Semicolon)
@@ -306,6 +308,12 @@ std::unique_ptr<RawAssignment> Parser::parseRawAssignment() {
     auto right = parseExpression();
     eat(TokenType::Semicolon, "expected semicolon after raw assignment");
     return std::make_unique<RawAssignment>(tkn.location, std::move(mem), std::move(right));
+}
+std::unique_ptr<RawLabel> Parser::parseRawLabel() {
+    auto tkn = eat(TokenType::Identifier, "expected label identifier for label definition");
+    eat(TokenType::Colon, "expected colon after identifier for label definition");
+
+    return std::make_unique<RawLabel>(tkn.location, tkn.lexeme);
 }
 
 // == EXPRESSION PARSERS ==

@@ -246,6 +246,7 @@ public:
     void visit(SyscallStatement& node) override;
     void visit(ArithmeticOperation& node) override;
     void visit(RawAssignment& node) override;
+    void visit(RawLabel& node) override;
 };
 
 } // namespace casmlang

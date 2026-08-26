@@ -180,3 +180,6 @@ void PrettyPrinter::visit(RawAssignment& node) {
     stream << " = ";
     node.right->accept(*this);
 }
+void PrettyPrinter::visit(RawLabel& node) {
+    stream << "label " << node.labelname;
+}

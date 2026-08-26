@@ -8,7 +8,7 @@
 
 template <typename T> using uq = std::unique_ptr<T>;
 
-enum class SymbolKind { Variable, Routine };
+enum class SymbolKind { Variable, Routine, Label };
 struct Symbol {
     std::string identifier;
     SymbolKind kind;
@@ -72,6 +72,7 @@ public:
     void visit(SyscallStatement& node) override;
     void visit(ArithmeticOperation& node) override;
     void visit(RawAssignment& node) override;
+    void visit(RawLabel& node) override;
 
     std::unique_ptr<ScopeBlock> hand_over_AST();
     void load_ast(uq<ScopeBlock> ast_);
