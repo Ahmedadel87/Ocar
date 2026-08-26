@@ -121,6 +121,9 @@ void ocarlang::IrGenerator::visit(ArithmeticOperation& node) {
         case BO::SUBTRACT:
             op = std::make_unique<IrSub>(std::move(left), std::move(right));
             break;
+        case BO::MULTIPLY:
+            op = std::make_unique<IrImul>(std::move(left), std::move(right));
+            break;
         default:
             break;
     }

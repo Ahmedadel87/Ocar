@@ -189,6 +189,20 @@ public:
         source->print(stream);
     }
 };
+class IrImul : public IrOp {
+public:
+    std::unique_ptr<IrMemName> destination;
+    std::unique_ptr<IrExpr> source;
+
+    IrImul(std::unique_ptr<IrMemName> destination_, std::unique_ptr<IrExpr> source_)
+        : destination(std::move(destination_)), source(std::move(source_)) {}
+
+    void print(std::ostream& stream) const override {
+        destination->print(stream);
+        stream << " -= ";
+        source->print(stream);
+    }
+};
 class IrXchg : public IrOp {
 public:
     std::unique_ptr<IrMemName> left;

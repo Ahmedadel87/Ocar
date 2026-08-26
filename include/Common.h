@@ -115,7 +115,6 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"+=", TokenType::ArithmeticAssign},
      {"-=", TokenType::ArithmeticAssign},
      {"*=", TokenType::ArithmeticAssign},
-     {"/=", TokenType::ArithmeticAssign},
 
      {"__END_OF_FILE__", TokenType::EndOfFile},
      {"(", TokenType::LParen},

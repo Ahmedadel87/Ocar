@@ -42,7 +42,8 @@ rtn _start() noret {
 - [x] Add `syscall` operation
 - [x] Raw register access (e.g. `raw rax = 5`)
 - [x] Variable support for assignment (allow `rax a = b;`)
-- [ ] Four operations
+- [x] Four operations
+  - Implemented three operations; addition, subtraction, and multiplication. Division requires hardcoded registers which doesn't currently work.
 - [x] If statements
   - [x] Comparisons
   - [ ] Else statements

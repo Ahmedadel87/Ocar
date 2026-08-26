@@ -26,6 +26,7 @@ private:
     void instr_print(IrSyscall* ins, std::ostream& stream);
     void instr_print(IrAdd* ins, std::ostream& stream);
     void instr_print(IrSub* ins, std::ostream& stream);
+    void instr_print(IrImul* ins, std::ostream& stream);
     void instr_print(IrXchg* ins, std::ostream& stream);
 
     void instr_print(IrIntLit* ins, std::ostream& stream);

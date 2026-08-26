@@ -38,6 +38,8 @@ void IrPrinter::dispatch_print(Ir* instr, std::ostream& stream) {
         instr_print(cst, stream);
     else if (auto cst = dynamic_cast<IrSub*>(instr))
         instr_print(cst, stream);
+    else if (auto cst = dynamic_cast<IrImul*>(instr))
+        instr_print(cst, stream);
     else if (auto cst = dynamic_cast<IrXchg*>(instr))
         instr_print(cst, stream);
     else
@@ -103,6 +105,13 @@ void IrPrinter::instr_print(IrSub* ins, std::ostream& stream) {
     print_indent(stream);
     stream << "sub ";
     dispatch_print(ins->destination.get(), stream); // NASM uses Intel syntax, so `sub dest, src`
+    stream << ", ";
+    dispatch_print(ins->source.get(), stream);
+}
+void IrPrinter::instr_print(IrImul* ins, std::ostream& stream) {
+    print_indent(stream);
+    stream << "imul ";
+    dispatch_print(ins->destination.get(), stream); // NASM uses Intel syntax, so `imul dest, src`
     stream << ", ";
     dispatch_print(ins->source.get(), stream);
 }
