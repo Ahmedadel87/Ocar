@@ -56,3 +56,5 @@ Thumbs.db
 # Code files
 main.ocar
 out.asm
+base.o
+base
