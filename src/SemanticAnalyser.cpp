@@ -325,3 +325,7 @@ void SemanticAnalyser::visit(JumpStatement& node) {
     if (symbol->kind != SymbolKind::Label)
         semaPanic("cannot jump to symbol \"" + symbol->identifier + "\"; it is not a label");
 }
+void SemanticAnalyser::visit(WhileLoop& node) {
+    node.comparison->accept(*this);
+    node.scope->accept(*this);
+}

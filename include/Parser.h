@@ -41,6 +41,7 @@ private:
     std::unique_ptr<MemoryName> parseMemoryName();
     std::unique_ptr<Statement> parseStatement();
     std::unique_ptr<RawAssignment> parseRawAssignment();
+    std::unique_ptr<WhileLoop> parseWhileLoop();
     std::unique_ptr<RawLabel> parseRawLabel();
     std::unique_ptr<JumpStatement> parseJumpStatement();
     std::unique_ptr<DeleteSymbol> parseDeleteVar();

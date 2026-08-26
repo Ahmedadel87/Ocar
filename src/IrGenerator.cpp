@@ -145,3 +145,18 @@ void ocarlang::IrGenerator::visit(RawLabel& node) {
 void ocarlang::IrGenerator::visit(JumpStatement& node) {
     ir.push_back(std::make_unique<IrJmp>(node.labelname, "jmp"));
 }
+void ocarlang::IrGenerator::visit(WhileLoop& node) {
+    std::string startLabel = generateLabel();
+    std::string continueLabel = generateLabel();
+    std::string endLabel = generateLabel();
+    std::string jumpName = condMap.at(node.cond);
+
+    ir.push_back(std::make_unique<IrLabelStmt>(startLabel));
+    node.comparison->accept(*this);
+    ir.push_back(std::make_unique<IrJmp>(continueLabel, jumpName));
+    ir.push_back(std::make_unique<IrJmp>(endLabel, "jmp"));
+    ir.push_back(std::make_unique<IrLabelStmt>(continueLabel));
+    node.scope->accept(*this);
+    ir.push_back(std::make_unique<IrJmp>(startLabel, "jmp"));
+    ir.push_back(std::make_unique<IrLabelStmt>(endLabel));
+}

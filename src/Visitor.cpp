@@ -189,3 +189,16 @@ void PrettyPrinter::visit(JumpStatement& node) {
     printIndent();
     stream << "jump " << node.labelname;
 }
+void PrettyPrinter::visit(WhileLoop& node) {
+    printIndent();
+    stream << "while";
+
+    indent++;
+
+    node.comparison->accept(*this);
+    printIndent();
+    stream << (int)node.cond;
+    node.scope->accept(*this);
+
+    indent--;
+}

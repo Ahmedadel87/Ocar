@@ -252,6 +252,7 @@ public:
     void visit(RawAssignment& node) override;
     void visit(RawLabel& node) override;
     void visit(JumpStatement& node) override;
+    void visit(WhileLoop& node) override;
 };
 
 } // namespace ocarlang

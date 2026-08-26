@@ -44,6 +44,7 @@ enum class TokenType {
     KeywordArithmeticOperation,
     KeywordRaw,
     KeywordJump,
+    KeywordWhile,
 
     EndOfFile
 };
@@ -80,6 +81,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"syscall", TokenType::KeywordSyscall},
      {"raw", TokenType::KeywordRaw},
      {"jump", TokenType::KeywordJump},
+     {"while", TokenType::KeywordWhile},
 
      {"greater", TokenType::KeywordCompareCond},
      {"greater_equal", TokenType::KeywordCompareCond},
@@ -445,6 +447,18 @@ public:
         : Statement(lct), labelname(labelname_) {}
     void accept(Visitor& visitor) override;
 };
+class WhileLoop : public Statement {
+public:
+    std::unique_ptr<Compare> comparison;
+    ComparativeConditions cond;
+    // the user is not exposed to the actual comparison and conditions
+    std::unique_ptr<ScopeBlock> scope;
+
+    WhileLoop(std::unique_ptr<Compare> comparison_, ComparativeConditions cond_,
+              std::unique_ptr<ScopeBlock> scope_)
+        : comparison(std::move(comparison_)), cond(cond_), scope(std::move(scope_)) {}
+    void accept(Visitor& visitor) override;
+};
 
 class Visitor {
 public:
@@ -478,6 +492,7 @@ public:
     virtual void visit(RawAssignment& node) = 0;
     virtual void visit(RawLabel& node) = 0;
     virtual void visit(JumpStatement& node) = 0;
+    virtual void visit(WhileLoop& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -516,6 +531,7 @@ public:
     void visit(RawAssignment& node) override;
     void visit(RawLabel& node) override;
     void visit(JumpStatement& node) override;
+    void visit(WhileLoop& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -600,5 +616,8 @@ inline void RawLabel::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void JumpStatement::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void WhileLoop::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

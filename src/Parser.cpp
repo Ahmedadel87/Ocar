@@ -82,6 +82,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseRawAssignment();
     else if (check(TokenType::KeywordJump))
         return parseJumpStatement();
+    else if (check(TokenType::KeywordWhile))
+        return parseWhileLoop();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -324,6 +326,44 @@ std::unique_ptr<JumpStatement> Parser::parseJumpStatement() {
 
     eat(TokenType::Semicolon, "expected semicolon after jump statement");
     return std::make_unique<JumpStatement>(tkn.location, identifier);
+}
+std::unique_ptr<WhileLoop> Parser::parseWhileLoop() {
+    auto tkn = eat(TokenType::KeywordWhile, "expected keyword 'while' for while loop");
+    eat(TokenType::LParen, "expected '(' after 'while' in while loop");
+
+    SourceLocation conditionLocation = peek().location;
+    auto left = parseMemoryName();
+    auto cond_string =
+        eat(TokenType::KeywordCompareCond, "expected comparison condition in while loop").lexeme;
+    auto right = parseExpression();
+
+    eat(TokenType::RParen, "expected ')' after while loop comparison");
+
+    auto scope = parseScope(true);
+
+    // done parsing, now we'll emit the actual nodes
+    using CC = ComparativeConditions;
+    CC cond;
+    {
+        if (cond_string == "greater")
+            cond = CC::GT;
+        else if (cond_string == "greater_equal")
+            cond = CC::GTEQ;
+        else if (cond_string == "less")
+            cond = CC::LT;
+        else if (cond_string == "less_equal")
+            cond = CC::LTEQ;
+        else if (cond_string == "equal")
+            cond = CC::EQ;
+        else if (cond_string == "not_equal")
+            cond = CC::NEQ;
+        else
+            parserPanic("invalid condition \"" + cond_string + "\"", tkn.location);
+    }
+
+    auto comparison =
+        std::make_unique<Compare>(conditionLocation, std::move(left), std::move(right));
+    return std::make_unique<WhileLoop>(std::move(comparison), cond, std::move(scope));
 }
 
 // == EXPRESSION PARSERS ==
