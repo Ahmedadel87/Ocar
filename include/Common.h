@@ -45,6 +45,7 @@ enum class TokenType {
     KeywordRaw,
     KeywordJump,
     KeywordWhile,
+    KeywordSwap,
 
     EndOfFile
 };
@@ -82,6 +83,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"raw", TokenType::KeywordRaw},
      {"jump", TokenType::KeywordJump},
      {"while", TokenType::KeywordWhile},
+     {"swap", TokenType::KeywordSwap},
 
      {"greater", TokenType::KeywordCompareCond},
      {"greater_equal", TokenType::KeywordCompareCond},
@@ -459,6 +461,16 @@ public:
         : comparison(std::move(comparison_)), cond(cond_), scope(std::move(scope_)) {}
     void accept(Visitor& visitor) override;
 };
+class SwapStatement : public Statement {
+public:
+    std::unique_ptr<MemoryName> left;
+    std::unique_ptr<MemoryName> right;
+
+    SwapStatement(const SourceLocation& lct, std::unique_ptr<MemoryName> left_,
+                  std::unique_ptr<MemoryName> right_)
+        : Statement(lct), left(std::move(left_)), right(std::move(right_)) {}
+    void accept(Visitor& visitor) override;
+};
 
 class Visitor {
 public:
@@ -493,6 +505,7 @@ public:
     virtual void visit(RawLabel& node) = 0;
     virtual void visit(JumpStatement& node) = 0;
     virtual void visit(WhileLoop& node) = 0;
+    virtual void visit(SwapStatement& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -532,6 +545,7 @@ public:
     void visit(RawLabel& node) override;
     void visit(JumpStatement& node) override;
     void visit(WhileLoop& node) override;
+    void visit(SwapStatement& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -619,5 +633,8 @@ inline void JumpStatement::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void WhileLoop::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void SwapStatement::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

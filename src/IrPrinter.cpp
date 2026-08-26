@@ -38,6 +38,8 @@ void IrPrinter::dispatch_print(Ir* instr, std::ostream& stream) {
         instr_print(cst, stream);
     else if (auto cst = dynamic_cast<IrSub*>(instr))
         instr_print(cst, stream);
+    else if (auto cst = dynamic_cast<IrXchg*>(instr))
+        instr_print(cst, stream);
     else
         panic("Internal, invalid print dispatch for instruction");
 }
@@ -103,6 +105,12 @@ void IrPrinter::instr_print(IrSub* ins, std::ostream& stream) {
     dispatch_print(ins->destination.get(), stream); // NASM uses Intel syntax, so `sub dest, src`
     stream << ", ";
     dispatch_print(ins->source.get(), stream);
+}
+void IrPrinter::instr_print(IrXchg* ins, std::ostream& stream) {
+    stream << "xchg ";
+    dispatch_print(ins->left.get(), stream);
+    stream << ", ";
+    dispatch_print(ins->right.get(), stream);
 }
 
 void IrPrinter::instr_print(IrIntLit* ins, std::ostream& stream) {

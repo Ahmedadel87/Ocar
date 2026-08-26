@@ -329,3 +329,7 @@ void SemanticAnalyser::visit(WhileLoop& node) {
     node.comparison->accept(*this);
     node.scope->accept(*this);
 }
+void SemanticAnalyser::visit(SwapStatement& node) {
+    node.left->accept(*this);
+    node.right->accept(*this);
+}

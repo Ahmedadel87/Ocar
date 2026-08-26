@@ -202,3 +202,9 @@ void PrettyPrinter::visit(WhileLoop& node) {
 
     indent--;
 }
+void PrettyPrinter::visit(SwapStatement& node) {
+    stream << "swap ";
+    node.left->accept(*this);
+    stream << " == ";
+    node.right->accept(*this);
+}

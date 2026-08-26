@@ -189,6 +189,20 @@ public:
         source->print(stream);
     }
 };
+class IrXchg : public IrOp {
+public:
+    std::unique_ptr<IrMemName> left;
+    std::unique_ptr<IrMemName> right;
+
+    IrXchg(std::unique_ptr<IrMemName> left_, std::unique_ptr<IrMemName> right_)
+        : left(std::move(left_)), right(std::move(right_)) {}
+
+    void print(std::ostream& stream) const override {
+        left->print(stream);
+        stream << " exchange ";
+        right->print(stream);
+    }
+};
 
 class IrGenerator : public Visitor {
 private:
@@ -253,6 +267,7 @@ public:
     void visit(RawLabel& node) override;
     void visit(JumpStatement& node) override;
     void visit(WhileLoop& node) override;
+    void visit(SwapStatement& node) override;
 };
 
 } // namespace ocarlang

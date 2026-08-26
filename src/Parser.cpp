@@ -84,6 +84,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseJumpStatement();
     else if (check(TokenType::KeywordWhile))
         return parseWhileLoop();
+    else if (check(TokenType::KeywordSwap))
+        return parseSwapStatement();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -364,6 +366,15 @@ std::unique_ptr<WhileLoop> Parser::parseWhileLoop() {
     auto comparison =
         std::make_unique<Compare>(conditionLocation, std::move(left), std::move(right));
     return std::make_unique<WhileLoop>(std::move(comparison), cond, std::move(scope));
+}
+std::unique_ptr<SwapStatement> Parser::parseSwapStatement() {
+    auto tkn = eat(TokenType::KeywordSwap, "expected keyword 'swap' for swap statement");
+    auto left = parseMemoryName();
+    match(TokenType::Comma); // optional
+    auto right = parseMemoryName();
+
+    eat(TokenType::Semicolon, "expected semicolon after swap statement");
+    return std::make_unique<SwapStatement>(tkn.location, std::move(left), std::move(right));
 }
 
 // == EXPRESSION PARSERS ==

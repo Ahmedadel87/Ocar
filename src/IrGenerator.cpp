@@ -160,3 +160,14 @@ void ocarlang::IrGenerator::visit(WhileLoop& node) {
     ir.push_back(std::make_unique<IrJmp>(startLabel, "jmp"));
     ir.push_back(std::make_unique<IrLabelStmt>(endLabel));
 }
+void ocarlang::IrGenerator::visit(SwapStatement& node) {
+    node.left->accept(*this);
+    auto left =
+        get_current_as<IrMemName>("expected swaps statement left to be a valid ir memory name");
+
+    node.right->accept(*this);
+    auto right =
+        get_current_as<IrMemName>("expected swaps statement right to be a valid ir memory name");
+
+    ir.push_back(std::make_unique<IrXchg>(std::move(left), std::move(right)));
+}
