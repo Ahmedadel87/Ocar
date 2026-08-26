@@ -110,7 +110,7 @@ void casmlang::IrGenerator::visit(ArithmeticOperation& node) {
     auto left = get_current_as<IrMemName>("expected left to be a memory name");
 
     node.right->accept(*this);
-    auto right = get_current_as<IrMemName>("expected right to be a memory name");
+    auto right = get_current_as<IrExpr>("expected right to be a memory name");
 
     using BO = BinaryOperation;
     std::unique_ptr<IrOp> op;

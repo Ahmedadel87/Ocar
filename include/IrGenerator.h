@@ -164,9 +164,9 @@ public:
 class IrAdd : public IrOp {
 public:
     std::unique_ptr<IrMemName> destination;
-    std::unique_ptr<IrMemName> source;
+    std::unique_ptr<IrExpr> source;
 
-    IrAdd(std::unique_ptr<IrMemName> destination_, std::unique_ptr<IrMemName> source_)
+    IrAdd(std::unique_ptr<IrMemName> destination_, std::unique_ptr<IrExpr> source_)
         : destination(std::move(destination_)), source(std::move(source_)) {}
 
     void print(std::ostream& stream) const override {
@@ -178,9 +178,9 @@ public:
 class IrSub : public IrOp {
 public:
     std::unique_ptr<IrMemName> destination;
-    std::unique_ptr<IrMemName> source;
+    std::unique_ptr<IrExpr> source;
 
-    IrSub(std::unique_ptr<IrMemName> destination_, std::unique_ptr<IrMemName> source_)
+    IrSub(std::unique_ptr<IrMemName> destination_, std::unique_ptr<IrExpr> source_)
         : destination(std::move(destination_)), source(std::move(source_)) {}
 
     void print(std::ostream& stream) const override {

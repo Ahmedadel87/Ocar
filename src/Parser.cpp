@@ -275,7 +275,7 @@ std::unique_ptr<ArithmeticOperation> Parser::parseArithmeticOperation() {
     auto op = eat(TokenType::ArithmeticAssign,
                   "expected arithmetic assignment operator for arithmetic operation")
                   .lexeme;
-    auto right = eat(TokenType::Identifier, "expected identifier on the right");
+    auto right = parseExpression();
 
     using BO = BinaryOperation;
     BO op_enum;
@@ -297,9 +297,8 @@ std::unique_ptr<ArithmeticOperation> Parser::parseArithmeticOperation() {
     }
 
     auto left_node = std::make_unique<VariableReference>(left.location, left.lexeme);
-    auto right_node = std::make_unique<VariableReference>(right.location, right.lexeme);
     return std::make_unique<ArithmeticOperation>(left.location, std::move(left_node), op_enum,
-                                                 std::move(right_node));
+                                                 std::move(right));
 }
 std::unique_ptr<RawAssignment> Parser::parseRawAssignment() {
     auto tkn = eat(TokenType::KeywordRaw, "expected keyword 'raw' for raw assignment");

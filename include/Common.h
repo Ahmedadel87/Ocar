@@ -410,10 +410,10 @@ class ArithmeticOperation : public Statement {
 public:
     std::unique_ptr<MemoryName> left;
     BinaryOperation operation;
-    std::unique_ptr<MemoryName> right;
+    std::unique_ptr<Expression> right;
 
     ArithmeticOperation(const SourceLocation& lct, std::unique_ptr<MemoryName> left_,
-                        BinaryOperation op, std::unique_ptr<MemoryName> right_)
+                        BinaryOperation op, std::unique_ptr<Expression> right_)
         : Statement(lct), left(std::move(left_)), operation(op), right(std::move(right_)) {}
     void accept(Visitor& visitor) override;
 };
