@@ -142,3 +142,6 @@ void ocarlang::IrGenerator::visit(RawAssignment& node) {
 void ocarlang::IrGenerator::visit(RawLabel& node) {
     ir.push_back(std::make_unique<IrLabelStmt>(node.labelname));
 }
+void ocarlang::IrGenerator::visit(JumpStatement& node) {
+    ir.push_back(std::make_unique<IrJmp>(node.labelname, "jmp"));
+}

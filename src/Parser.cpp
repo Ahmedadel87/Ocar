@@ -80,6 +80,8 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         return parseSyscall();
     else if (check(TokenType::KeywordRaw))
         return parseRawAssignment();
+    else if (check(TokenType::KeywordJump))
+        return parseJumpStatement();
     else {
         parserPanic("invalid token \"" + peek().lexeme + "\"", peek().location);
         return nullptr;
@@ -314,6 +316,14 @@ std::unique_ptr<RawLabel> Parser::parseRawLabel() {
     eat(TokenType::Colon, "expected colon after identifier for label definition");
 
     return std::make_unique<RawLabel>(tkn.location, tkn.lexeme);
+}
+std::unique_ptr<JumpStatement> Parser::parseJumpStatement() {
+    auto tkn = eat(TokenType::KeywordJump, "expected keyword 'jump' for jump statement");
+    auto identifier =
+        eat(TokenType::Identifier, "expected label identifier for jump statement").lexeme;
+
+    eat(TokenType::Semicolon, "expected semicolon after jump statement");
+    return std::make_unique<JumpStatement>(tkn.location, identifier);
 }
 
 // == EXPRESSION PARSERS ==

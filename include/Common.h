@@ -43,6 +43,7 @@ enum class TokenType {
     KeywordSyscall,
     KeywordArithmeticOperation,
     KeywordRaw,
+    KeywordJump,
 
     EndOfFile
 };
@@ -78,6 +79,7 @@ const std::unordered_map<std::string, TokenType> word_table{
      {"compare", TokenType::KeywordCompare},
      {"syscall", TokenType::KeywordSyscall},
      {"raw", TokenType::KeywordRaw},
+     {"jump", TokenType::KeywordJump},
 
      {"greater", TokenType::KeywordCompareCond},
      {"greater_equal", TokenType::KeywordCompareCond},
@@ -435,6 +437,14 @@ public:
         : Statement(lct), labelname(labelname_) {}
     void accept(Visitor& visitor) override;
 };
+class JumpStatement : public Statement {
+public:
+    std::string labelname;
+
+    JumpStatement(const SourceLocation& lct, const std::string& labelname_)
+        : Statement(lct), labelname(labelname_) {}
+    void accept(Visitor& visitor) override;
+};
 
 class Visitor {
 public:
@@ -467,6 +477,7 @@ public:
     virtual void visit(ArithmeticOperation& node) = 0;
     virtual void visit(RawAssignment& node) = 0;
     virtual void visit(RawLabel& node) = 0;
+    virtual void visit(JumpStatement& node) = 0;
 };
 class PrettyPrinter : public Visitor {
 private:
@@ -504,6 +515,7 @@ public:
     void visit(ArithmeticOperation& node) override;
     void visit(RawAssignment& node) override;
     void visit(RawLabel& node) override;
+    void visit(JumpStatement& node) override;
 };
 
 inline void ScopeBlock::accept(Visitor& visitor) {
@@ -585,5 +597,8 @@ inline void RawAssignment::accept(Visitor& visitor) {
     visitor.visit(*this);
 }
 inline void RawLabel::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+inline void JumpStatement::accept(Visitor& visitor) {
     visitor.visit(*this);
 }

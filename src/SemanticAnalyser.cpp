@@ -317,3 +317,11 @@ void SemanticAnalyser::visit(RawLabel& node) {
 
     addSymbol(Symbol(node.labelname, SymbolKind::Label, 0, "", &node));
 }
+void SemanticAnalyser::visit(JumpStatement& node) {
+    auto symbol = getSymbol(node.labelname);
+    if (!symbol)
+        semaPanic("cannot jump to label \"" + node.labelname + "\"; it is not defined");
+
+    if (symbol->kind != SymbolKind::Label)
+        semaPanic("cannot jump to symbol \"" + symbol->identifier + "\"; it is not a label");
+}
