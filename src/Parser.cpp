@@ -262,7 +262,8 @@ std::unique_ptr<Compare> Parser::parseCompareStatement() {
     auto tkn = eat(TokenType::KeywordCompare, "expected keyword 'compare' for compare statement");
     auto left = parseMemoryName();
     eat(TokenType::Comma, "expected comma after first memory name in 'compare' statement");
-    auto right = parseMemoryName();
+    auto right = parseExpression();
+
     return std::make_unique<Compare>(tkn.location, std::move(left), std::move(right));
 }
 std::unique_ptr<SyscallStatement> Parser::parseSyscall() {

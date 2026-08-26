@@ -91,7 +91,13 @@ void casmlang::IrGenerator::visit(IfStatement& node) {
     ir.push_back(std::make_unique<IrLabelStmt>(endLabel));
 };
 void casmlang::IrGenerator::visit(Compare& node) {
-    ir.push_back(std::make_unique<IrCmp>(node.left->name, node.right->name));
+    node.left->accept(*this);
+    auto left = get_current_as<IrMemName>();
+
+    node.right->accept(*this);
+    auto right = get_current_as<IrExpr>();
+
+    ir.push_back(std::make_unique<IrCmp>(std::move(left), std::move(right)));
 }
 void casmlang::IrGenerator::visit(RegisterName& node) {
     currentNode = std::make_unique<IrMemName>(node.name);

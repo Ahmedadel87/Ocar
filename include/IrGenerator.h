@@ -137,12 +137,16 @@ public:
 };
 class IrCmp : public IrStmt {
 public:
-    std::string left;
-    std::string right;
+    std::unique_ptr<IrMemName> left;
+    std::unique_ptr<IrExpr> right;
 
-    IrCmp(const std::string& left_, const std::string& right_) : left(left_), right(right_) {}
+    IrCmp(std::unique_ptr<IrMemName> left_, std::unique_ptr<IrExpr> right_)
+        : left(std::move(left_)), right(std::move(right_)) {}
     void print(std::ostream& stream) const override {
-        stream << "cmp " << left << ", " << right;
+        stream << "cmp ";
+        left->print(stream);
+        stream << ", ";
+        right->print(stream);
     }
 };
 class IrSyscall : public IrStmt {

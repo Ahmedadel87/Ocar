@@ -269,21 +269,28 @@ void SemanticAnalyser::visit(IfStatement& node) {
     node.scope->accept(*this);
 }
 void SemanticAnalyser::visit(Compare& node) {
-    std::vector<MemoryName*> cdr = {node.left.get(), node.right.get()};
+    std::vector<Expression*> cdr = {node.left.get(), node.right.get()};
 
     for (auto& child : cdr) { // no need to copy logic, iterate through childreen
-        if (auto var = dynamic_cast<VariableReference*>(child)) {
-            if (!symbolExists(var->identifier))
-                semaPanic("can't compare variable \"" + var->identifier + "\"; it is not declared",
-                          node.location);
-            auto symbol = getSymbol(var->identifier);
-            if (symbol->kind != SymbolKind::Variable)
-                semaPanic("can't compare symbol \"" + var->identifier + "\"; it is not a variable",
-                          node.location);
+        if (auto memname = dynamic_cast<MemoryName*>(child)) {
+            if (auto var = dynamic_cast<VariableReference*>(child)) {
+                if (!symbolExists(var->identifier))
+                    semaPanic("can't compare variable \"" + var->identifier +
+                                  "\"; it is not declared",
+                              var->location);
+                auto symbol = getSymbol(var->identifier);
+                if (symbol->kind != SymbolKind::Variable)
+                    semaPanic("can't compare symbol \"" + var->identifier +
+                                  "\"; it is not a variable",
+                              var->location);
 
-            child->name = getSymbol(var->identifier)->memoryName;
-        } else if (auto reg = dynamic_cast<RegisterName*>(child)) {
-            child->name = reg->name;
+                memname->name = getSymbol(var->identifier)->memoryName;
+            } else if (auto reg = dynamic_cast<RegisterName*>(child)) {
+                memname->name = reg->name;
+            }
+        } else if (auto reg = dynamic_cast<IntegerLiteral*>(child)) {
+        } else {
+            semaPanic("invalid comparison node in compare", child->location);
         }
     }
 }

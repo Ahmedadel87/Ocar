@@ -393,11 +393,11 @@ public:
 class Compare : public Statement {
 public:
     std::unique_ptr<MemoryName> left;
-    std::unique_ptr<MemoryName> right;
+    std::unique_ptr<Expression> right;
     void accept(Visitor& visitor) override;
 
     Compare(const SourceLocation& lct, std::unique_ptr<MemoryName> left_,
-            std::unique_ptr<MemoryName> right_)
+            std::unique_ptr<Expression> right_)
         : Statement(lct), left(std::move(left_)), right(std::move(right_)) {}
 };
 class SyscallStatement : public Statement {

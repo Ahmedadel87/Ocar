@@ -81,7 +81,10 @@ void IrPrinter::instr_print(IrJmp* ins, std::ostream& stream) {
 }
 void IrPrinter::instr_print(IrCmp* ins, std::ostream& stream) {
     print_indent(stream);
-    stream << "cmp " << ins->left << ", " << ins->right;
+    stream << "cmp ";
+    dispatch_print(ins->left.get(), stream);
+    stream << ", ";
+    dispatch_print(ins->right.get(), stream);
 }
 void IrPrinter::instr_print(IrSyscall* ins, std::ostream& stream) {
     print_indent(stream);
