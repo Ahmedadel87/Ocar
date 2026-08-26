@@ -58,3 +58,5 @@ main.ocar
 out.asm
 base.o
 base
+out.o
+out
