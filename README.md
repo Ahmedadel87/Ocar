@@ -55,6 +55,7 @@ rtn _start() noret {
 - [ ] Stack memory acces (e.g. `stk[bytecount] varname = 0;`, `stk[8] myint = 17;`)
 - [ ] Function parameters/arguments
   - Maybe give an optional `autopush` keyword that finds free spots in the stack and pushes the registers used by parameters into them, then loads them on exit, so users don't have to worry about register data disappearing.
+- [ ] `auto` keyword to automatically choose an unused register
 
 ## Name
 Ocar's name is a recursive acronym stnding for OCAR Can't Allocate Registers.
