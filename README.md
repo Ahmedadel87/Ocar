@@ -46,7 +46,7 @@ rtn _start() noret {
 - [x] If statements
   - [x] Comparisons
   - [ ] Else statements
-- [ ] Goto and labels
+- [x] Goto and labels
 - [ ] While loops
 - [ ] For loops
 - [ ] Add linking. Probably C-style, because it's easier.
