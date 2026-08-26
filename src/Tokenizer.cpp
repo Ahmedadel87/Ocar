@@ -13,7 +13,7 @@
     advance();                                                                                     \
     continue
 
-namespace casmlang {
+namespace ocarlang {
 namespace fs = std::filesystem;
 
 void Tokenizer::advance(int amount) {
@@ -45,7 +45,7 @@ void Tokenizer::assert_validity(const int pos, const std::string& msg) const {
     }
 }
 void Tokenizer::token(const TokenType tkn, const std::string& lexeme_, SourceLocation lct) {
-    tokens.push_back(casmlang::Token(tkn, lexeme_, lct));
+    tokens.push_back(ocarlang::Token(tkn, lexeme_, lct));
 }
 bool Tokenizer::eof() {
     return cursor >= code.size();
@@ -64,7 +64,7 @@ TokenType Tokenizer::get_word_type(const std::string& str, bool allow_identifier
     }
     return TokenType::None;
 }
-std::vector<casmlang::Token>& Tokenizer::get_tokens() {
+std::vector<ocarlang::Token>& Tokenizer::get_tokens() {
     return tokens;
 }
 
@@ -221,4 +221,4 @@ void Tokenizer::tokenize(const std::string& c) {
 
     token(TokenType::EndOfFile, "\0", SourceLocation(row, column));
 }
-} // namespace casmlang
+} // namespace ocarlang

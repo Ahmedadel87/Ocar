@@ -5,7 +5,7 @@
 #include <ostream>
 #include <unordered_map>
 
-namespace casmlang {
+namespace ocarlang {
 const std::unordered_map<ComparativeConditions, std::string> condMap = {
     {ComparativeConditions::EQ, "je"}, {ComparativeConditions::NEQ, "jne"},
     {ComparativeConditions::GT, "jg"}, {ComparativeConditions::GTEQ, "jge"},
@@ -253,4 +253,4 @@ public:
     void visit(RawLabel& node) override;
 };
 
-} // namespace casmlang
+} // namespace ocarlang

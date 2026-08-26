@@ -11,11 +11,11 @@
 
 class Compiler {
 private:
-    casmlang::Tokenizer tokenizer;
+    ocarlang::Tokenizer tokenizer;
     Parser parser;
     SemanticAnalyser sema;
-    casmlang::IrGenerator irgen;
-    casmlang::IrPrinter printer;
+    ocarlang::IrGenerator irgen;
+    ocarlang::IrPrinter printer;
 
 public:
     void compile(const std::string& code, std::ostream& stream = std::cout);

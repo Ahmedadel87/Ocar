@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace casmlang {
+namespace ocarlang {
 
 class Token {
 public:

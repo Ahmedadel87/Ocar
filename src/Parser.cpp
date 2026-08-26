@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 
-void Parser::load_tokens(std::vector<casmlang::Token> tkns) {
+void Parser::load_tokens(std::vector<ocarlang::Token> tkns) {
     tokens = std::move(tkns);
 }
 std::unique_ptr<ScopeBlock> Parser::hand_over_AST() {
@@ -86,7 +86,7 @@ std::unique_ptr<Statement> Parser::parseStatement() {
     }
 }
 std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
-    casmlang::Token tkn =
+    ocarlang::Token tkn =
         eat(TokenType::KeywordRegister, "expected memory name for variable declaration");
 
     std::string type_string = tkn.lexeme;
@@ -103,7 +103,7 @@ std::unique_ptr<VariableDefinition> Parser::parseVariableDeclaration() {
                                                 std::move(value));
 }
 std::unique_ptr<RoutineCallExpr> Parser::parseFunctionCallExpr() {
-    casmlang::Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
+    ocarlang::Token tkn = eat(TokenType::Identifier, "expected identifier for function call");
     std::string identifier = tkn.lexeme;
     eat(TokenType::LParen, "expected '(' after identifier for function call");
     std::vector<std::unique_ptr<Expression>> args;
@@ -123,7 +123,7 @@ std::unique_ptr<RoutineCallExpr> Parser::parseFunctionCallExpr() {
     return std::make_unique<RoutineCallExpr>(tkn.location, identifier, std::move(args));
 }
 std::unique_ptr<VariableReassignment> Parser::parseVariableReassignment() {
-    casmlang::Token tkn =
+    ocarlang::Token tkn =
         eat(TokenType::Identifier, "expected identifier for variable reassignment");
     std::string identifier = tkn.lexeme;
 
@@ -135,7 +135,7 @@ std::unique_ptr<VariableReassignment> Parser::parseVariableReassignment() {
     return std::move(ptr);
 }
 std::unique_ptr<RoutineCallStmt> Parser::parseRoutineCallStmt() {
-    casmlang::Token tkn = eat(TokenType::Identifier, "expected identifier for routine call");
+    ocarlang::Token tkn = eat(TokenType::Identifier, "expected identifier for routine call");
     std::string identifier = tkn.lexeme;
 
     eat(TokenType::LParen, "expected '(' after identifier for routine call");
@@ -157,7 +157,7 @@ std::unique_ptr<RoutineCallStmt> Parser::parseRoutineCallStmt() {
     return std::make_unique<RoutineCallStmt>(tkn.location, identifier, std::move(args));
 }
 std::unique_ptr<SectionDefinition> Parser::parseSectionDefinition() {
-    casmlang::Token tkn =
+    ocarlang::Token tkn =
         eat(TokenType::KeywordSection, "expected keyword 'sect' for section definition");
 
     std::string type_string = tkn.lexeme;
@@ -177,7 +177,7 @@ std::unique_ptr<Global> Parser::parseGlobal() {
     return std::make_unique<Global>(identifier);
 }
 std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {
-    casmlang::Token tkn =
+    ocarlang::Token tkn =
         eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine definition");
 
     std::string type_string = tkn.lexeme;
@@ -191,7 +191,7 @@ std::unique_ptr<RoutineDefinition> Parser::parseRoutineDefinition() {
     return std::make_unique<RoutineDefinition>(identifier, std::move(scope), hasReturn);
 }
 std::unique_ptr<RoutineDeclaration> Parser::parseRoutineDeclaration() {
-    casmlang::Token tkn =
+    ocarlang::Token tkn =
         eat(TokenType::KeywordRoutine, "expected keyword 'rtn' for routine declaration");
 
     std::string type_string = tkn.lexeme;
@@ -222,7 +222,7 @@ std::unique_ptr<FreeMemory> Parser::parseFreeMemory() {
     return std::make_unique<FreeMemory>(memname);
 }
 std::unique_ptr<MemoryName> Parser::parseMemoryName() {
-    casmlang::Token tkn = peek();
+    ocarlang::Token tkn = peek();
     if (check(TokenType::KeywordRegister)) {
         tkn = eat(TokenType::KeywordRegister, "internal, expected register for memory name");
         return std::make_unique<RegisterName>(tkn.location, tkn.lexeme);
@@ -368,7 +368,7 @@ std::unique_ptr<IntegerLiteral> Parser::parseInteger() {
         negative = true;
     }
 
-    casmlang::Token tkn = eat(TokenType::IntegerLiteral, "expected integer literal");
+    ocarlang::Token tkn = eat(TokenType::IntegerLiteral, "expected integer literal");
     return std::make_unique<IntegerLiteral>(tkn.location, std::stoi(tkn.lexeme));
 }
 std::unique_ptr<FloatLiteral> Parser::parseFloat() {
@@ -377,23 +377,23 @@ std::unique_ptr<FloatLiteral> Parser::parseFloat() {
         negative = true;
     }
 
-    casmlang::Token tkn = eat(TokenType::FloatLiteral, "expected float literal");
+    ocarlang::Token tkn = eat(TokenType::FloatLiteral, "expected float literal");
     return std::make_unique<FloatLiteral>(tkn.location, std::stof(tkn.lexeme));
 }
 std::unique_ptr<StringLiteral> Parser::parseString() {
-    casmlang::Token tkn = eat(TokenType::StringLiteral, "expected a string literal");
+    ocarlang::Token tkn = eat(TokenType::StringLiteral, "expected a string literal");
     return std::make_unique<StringLiteral>(tkn.location, tkn.lexeme);
 }
 
 // == HELPERS ==
-casmlang::Token& Parser::peek(int offset) {
+ocarlang::Token& Parser::peek(int offset) {
     if (cursor + offset > tokens.size()) {
         parserPanic("cannot peek into token number " + std::to_string(cursor + offset) +
                     "; such token does not exist.");
     }
     return tokens[cursor + offset];
 }
-casmlang::Token& Parser::previous(int offset) {
+ocarlang::Token& Parser::previous(int offset) {
     if (cursor - offset > tokens.size()) {
         parserPanic("cannot peek into previous token number " + std::to_string(cursor - offset) +
                     "; such token does not exist.");
@@ -428,11 +428,11 @@ void Parser::advance(int offset) {
     }
     cursor += offset;
 }
-casmlang::Token Parser::eat(TokenType type, const std::string& msg) {
+ocarlang::Token Parser::eat(TokenType type, const std::string& msg) {
     if (!check(type))
         parserPanic(msg, peek().location);
 
-    casmlang::Token t = peek();
+    ocarlang::Token t = peek();
     advance();
     return t;
 }

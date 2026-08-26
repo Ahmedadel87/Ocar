@@ -5,7 +5,7 @@
 #include <fstream>
 #define ucharcast(x) static_cast<unsigned char>(x)
 
-namespace casmlang {
+namespace ocarlang {
 namespace fs = std::filesystem;
 void Tokenizer::prcs_process() {
     if (current() != '#')
@@ -78,4 +78,4 @@ void Tokenizer::prcs_process_include() {
      * but otherwise, it's okay
      */
 }
-} // namespace casmlang
+} // namespace ocarlang

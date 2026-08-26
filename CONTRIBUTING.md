@@ -6,11 +6,11 @@ Assuming you're on GitHub, you must first fork the repository to your own accoun
 ![Photo of the fork button](readmeinfo/fork.png)
 After that, go to the directory where you want to do your edits and run:
 ```bash
-git clone https://github.com/YOUR-GITHUB-USERNAME/CasmLang
+git clone https://github.com/YOUR-GITHUB-USERNAME/Ocar
 ```
 This will download the code into your device. Then run:
 ```bash
-git remote add upstream https://github.com/Mher-DeLight/CasmLang
+git remote add upstream https://github.com/Mher-DeLight/Ocar
 git switch -c thing-youre-adding
 ```
 This will create a new branch. You should name the branch based on the feature you're adding such that it is easy to tell what it's supposed to do. Making a new branch will make it that your changes don't directly affect the main branch if you mess something up.

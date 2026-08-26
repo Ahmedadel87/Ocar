@@ -6,14 +6,14 @@
 
 class Parser {
 private:
-    std::vector<casmlang::Token> tokens;
+    std::vector<ocarlang::Token> tokens;
     std::unique_ptr<ScopeBlock> entry_point = std::make_unique<ScopeBlock>();
 
     int cursor = 0;
 
-    casmlang::Token& peek(int offset = 0);
-    casmlang::Token& previous(int offset = 0);
-    casmlang::Token eat(TokenType type, const std::string& msg = "");
+    ocarlang::Token& peek(int offset = 0);
+    ocarlang::Token& previous(int offset = 0);
+    ocarlang::Token eat(TokenType type, const std::string& msg = "");
     bool isEnd();
     bool match(TokenType type);
     bool check(TokenType type);
@@ -59,7 +59,7 @@ private:
 
     // clang-format on
 public:
-    void load_tokens(std::vector<casmlang::Token> tokens_);
+    void load_tokens(std::vector<ocarlang::Token> tokens_);
     void parse();
     std::unique_ptr<ScopeBlock> hand_over_AST();
 };

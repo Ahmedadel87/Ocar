@@ -2,7 +2,7 @@
 #include "Common.h"
 #include "IrGenerator.h"
 
-namespace casmlang {
+namespace ocarlang {
 class IrPrinter {
 private:
     std::vector<std::unique_ptr<Ir>> ir;
@@ -34,4 +34,4 @@ public:
     void load_ir(std::vector<std::unique_ptr<Ir>> ir_);
     void print(std::ostream& stream);
 };
-} // namespace casmlang
+} // namespace ocarlang
