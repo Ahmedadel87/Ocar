@@ -13,14 +13,16 @@ void Tokenizer::prcs_process() {
     advance();
 
     std::string command = "";
-    while (!eof() && current() != ' ') {
+    while (!eof() && current() != ' ' && current() != '\n') {
         command += current();
         advance();
     }
-    advance(); // skip space
+    advance(); // skip space or newline
 
     if (command == "stdlib") {
         prcs_process_include();
+    } else if (command == "noheader") {
+        prcs_process_noheader();
     }
 }
 
@@ -78,4 +80,8 @@ void Tokenizer::prcs_process_include() {
      * but otherwise, it's okay
      */
 }
+void Tokenizer::prcs_process_noheader() {
+    makeHeader = false;
+}
+
 } // namespace ocarlang

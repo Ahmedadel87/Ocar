@@ -32,6 +32,7 @@ private:
     void instr_print(IrMemName* ins, std::ostream& stream);
 
 public:
+    bool makeHeader = true;
     void load_ir(std::vector<std::unique_ptr<Ir>> ir_);
     void print(std::ostream& stream);
 };

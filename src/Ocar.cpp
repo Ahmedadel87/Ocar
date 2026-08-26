@@ -4,6 +4,7 @@
 
 void Compiler::compile(const std::string& code, std::ostream& stream) {
     tokenizer.tokenize(code);
+    bool makeHeader = tokenizer.makeHeader;
 
     parser.load_tokens(std::move(tokenizer.get_tokens()));
     parser.parse();
@@ -14,6 +15,7 @@ void Compiler::compile(const std::string& code, std::ostream& stream) {
     irgen.load_ast(sema.hand_over_AST());
     irgen.generate_ir();
 
+    printer.makeHeader = makeHeader;
     printer.load_ir(irgen.give_ir());
     printer.print(stream);
 }

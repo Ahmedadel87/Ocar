@@ -39,10 +39,12 @@ private:
     // == PREPROCESSOR ==
     void prcs_process();
     void prcs_process_include();
+    void prcs_process_noheader();
 
 public:
+    bool makeHeader = true;
     void tokenize(const std::string& c);
     std::vector<Token>& get_tokens();
     void pretty_print(std::ostream& os);
 };
-}
+} // namespace ocarlang
